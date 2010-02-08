@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="ruleflow" id="com.sample.ruleflow" package-name="com.sample" routerLayout="1" >
+
+  <header>
+    <variables>
+      <variable name="names" >
+        <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.List" />
+      </variable>
+      <variable name="name" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+    </variables>
+  </header>
+
+  <nodes>
+    <start id="1" name="Start" x="16" y="110" width="80" height="40" />
+    <end id="3" name="End" x="545" y="110" width="80" height="40" />
+    <forEach id="5" name="ForEach" x="128" y="16" width="385" height="229" variableName="name" collectionExpression="names" >
+      <nodes>
+    <workItem id="4" name="Script" x="59" y="34" width="80" height="40" >
+      <work name="Script" >
+        <parameter name="Code" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Error" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Keep Session?" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Output" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Server Address" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Session" >
+          <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="null" />
+        </parameter>
+      </work>
+    </workItem>
+    <workItem id="5" name="R Statistics" x="218" y="33" width="106" height="40" >
+      <work name="RStatistics" >
+        <parameter name="Code" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Error" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Keep Session?" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Output" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Server Address" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Session" >
+          <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="null" />
+        </parameter>
+      </work>
+    </workItem>
+    <workItem id="6" name="Database" x="120" y="100" width="105" height="40" >
+      <work name="Database" >
+        <parameter name="CSV Input" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="CSV Output" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Data Mappings" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Error" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="JDBC Driver Class" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="JDBC URI" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Password" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Record Count" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="SQL Code" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Table Name" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="User" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="statement Type" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+      </work>
+    </workItem>
+    <workItem id="7" name="Excel" x="32" y="167" width="80" height="40" >
+      <work name="Excel" >
+        <parameter name="Anchor" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Column Limit" >
+          <type name="org.drools.process.core.datatype.impl.type.IntegerDataType" />
+        </parameter>
+        <parameter name="Data File" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Output File" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Row Limit" >
+          <type name="org.drools.process.core.datatype.impl.type.IntegerDataType" />
+        </parameter>
+        <parameter name="Sheet Name" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Skip Header" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Template File" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+      </work>
+    </workItem>
+    <workItem id="11" name="Email Sender" x="229" y="166" width="125" height="40" >
+      <work name="Email Sender" >
+        <parameter name="Attachments" >
+          <type name="org.drools.process.core.datatype.impl.type.ListDataType" className="java.util.List" />
+        </parameter>
+        <parameter name="BCC" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Body" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="CC" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="From" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="HTML" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Host" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Password" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Port" >
+          <type name="org.drools.process.core.datatype.impl.type.IntegerDataType" />
+        </parameter>
+        <parameter name="SSL" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Subject" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="To" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="User" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+      </work>
+    </workItem>
+      </nodes>
+      <connections>
+    <connection from="4" to="5" />
+    <connection from="5" to="6" />
+    <connection from="6" to="7" />
+    <connection from="7" to="11" />
+      </connections>
+      <in-ports>
+        <in-port type="DROOLS_DEFAULT" nodeId="4" nodeInType="DROOLS_DEFAULT" />
+      </in-ports>
+      <out-ports>
+        <out-port type="DROOLS_DEFAULT" nodeId="11" nodeOutType="DROOLS_DEFAULT" />
+      </out-ports>
+    </forEach>
+  </nodes>
+
+  <connections>
+    <connection from="5" to="3" />
+    <connection from="1" to="5" />
+  </connections>
+
+</process>
