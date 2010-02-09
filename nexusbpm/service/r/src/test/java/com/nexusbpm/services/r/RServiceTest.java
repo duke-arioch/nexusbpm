@@ -5,9 +5,8 @@ import java.io.IOException;
 import com.nexusbpm.common.NexusTestCase;
 import com.nexusbpm.common.data.Parameter;
 import com.nexusbpm.common.data.ParameterType;
-import com.nexusbpm.common.io.DataflowStreamProviderFactory;
-import com.nexusbpm.common.io.interfaces.OutputDataflowStreamProvider;
 import com.nexusbpm.services.NexusServiceException;
+import junit.framework.Assert;
 
 public class RServiceTest extends NexusTestCase {
     private String unique = "output-" + System.currentTimeMillis();
@@ -18,22 +17,17 @@ public class RServiceTest extends NexusTestCase {
         data.setProcessName("rprocess");
         data.setProcessVersion("1");
     }
-    private OutputDataflowStreamProvider getOutputProvider(String filename) throws IOException{
-        return DataflowStreamProviderFactory
-        .getInstance()
-        .getOutputProvider("nexus/RService", filename, "rtest", "12", "111");
-    }
-//    private InputDataflowStreamProvider getInputProvider(String uri) throws IOException{
+//    private OutputDataflowStreamProvider getOutputProvider(String filename) throws IOException{
 //        return DataflowStreamProviderFactory
 //        .getInstance()
-//        .getInputProvider(URI.create(uri));
+//        .getOutputProvider("nexus/RService", filename, "rtest", "12", "111");
 //    }
     
     private RParameterMap getPlotData() throws Exception {
         RParameterMap data = new RParameterMap();
         setSharedData(data);
         data.put(new Parameter("radius", null, null, ParameterType.INT, new Integer(1000), false, Parameter.DIRECTION_INPUT_AND_OUTPUT));
-        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, getOutputProvider("test.png"), false, Parameter.DIRECTION_OUTPUT));
+//        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, getOutputProvider("test.png"), false, Parameter.DIRECTION_OUTPUT));
         data.setCode( 
             "t=seq(0,2*pi,length=10000);\n" +
             "png(filename=imageLocation, width=800, height=600, bg=\"grey\");\n" +
@@ -60,7 +54,7 @@ public class RServiceTest extends NexusTestCase {
 //            Icon icon = (Icon) new ImageIcon(new URL(data.get("imageLocation").getValue().toString()));
 //            JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
         }
-        assertEquals(1001, data.get("radius").getValue());
+        Assert.assertEquals(1001, data.get("radius").getValue());
     }
     
     public void testRSyntaxExceptionHandling() throws Exception {
@@ -73,7 +67,7 @@ public class RServiceTest extends NexusTestCase {
             System.out.println("Code:\n" + data.getCode());
             System.out.println("Output:\n" + data.getOutput());
             System.out.println("Error:\n" + data.getError());
-            fail("Exception should have been thrown");
+            Assert.fail("Exception should have been thrown");
         } catch(NexusServiceException e) {
             e.printStackTrace(System.out);
             data = new RParameterMap(e.getOutputData());
@@ -81,7 +75,7 @@ public class RServiceTest extends NexusTestCase {
         System.out.println("Code:\n" + data.getCode());
         System.out.println("Output:\n" + data.getOutput());
         System.out.println("Error:\n" + data.getError());
-        assertTrue(data.getError().contains("Error in try({ : object \"xxx\" not found"));
+        Assert.assertTrue(data.getError().contains("Error in try({ : object \"xxx\" not found"));
     }
     
 //	private RParameterMap getDBData() throws Exception {
@@ -119,7 +113,7 @@ public class RServiceTest extends NexusTestCase {
     public void xtestDBR() throws Exception { //first i installed the rjdbc package on R...
         RServiceImpl r = new RServiceImpl();
         RParameterMap data = (RParameterMap) r.execute(get2WayData());
-        assertNotNull(data.get("file").getValue());
+        Assert.assertNotNull(data.get("file").getValue());
         System.out.println(data.getOutput());
         System.out.println(data.getError());
         

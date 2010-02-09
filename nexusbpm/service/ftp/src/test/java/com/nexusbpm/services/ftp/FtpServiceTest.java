@@ -28,20 +28,20 @@ public class FtpServiceTest {
     FakeFtpServer ftpServer = new FakeFtpServer();
     public static final Logger logger = LoggerFactory.getLogger(FtpServiceTest.class);
 
-//    @Before
+    @Before
     public void before() throws Exception {
-        UserAccount account = new UserAccount("nexusbpm", "nexusbpm", "/home");
+        UserAccount account = new UserAccount("nexusbpm", "nexusbpm", "/tmp");
         account.setPasswordRequiredForLogin(false);
         ftpServer.addUserAccount(account);
 
         FileSystem fileSystem = new UnixFakeFileSystem();
-        fileSystem.add(new DirectoryEntry("/home"));
+        fileSystem.add(new DirectoryEntry("/tmp"));
         ftpServer.setFileSystem(fileSystem);
         ftpServer.start();
         logger.error("Started FTP Service");
     }
 
-//    @After
+    @After
     public void after() throws Exception {
         ftpServer.stop();
         logger.error("Stopped FTP Service");

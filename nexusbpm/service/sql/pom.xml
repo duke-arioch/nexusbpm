@@ -11,6 +11,11 @@
     <name>nexusBPM services :: SQL</name>
     <dependencies>
         <dependency>
+            <groupId>org.ostermiller</groupId>
+            <artifactId>utils</artifactId>
+            <version>1.07.00</version>
+        </dependency>
+        <dependency>
             <groupId>nexusbpm</groupId>
             <artifactId>nexusbpm.common</artifactId>
         </dependency>

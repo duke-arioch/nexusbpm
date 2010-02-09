@@ -5,8 +5,7 @@ import java.util.Map;
 import com.nexusbpm.common.data.Parameter;
 import com.nexusbpm.common.data.ParameterLinkedHashMap;
 import com.nexusbpm.common.data.ParameterType;
-import com.nexusbpm.common.io.interfaces.InputDataflowStreamProvider;
-import com.nexusbpm.common.io.interfaces.OutputDataflowStreamProvider;
+import java.net.URI;
 
 public class SqlParameterMap extends ParameterLinkedHashMap {
     private static final long serialVersionUID = 1L;
@@ -136,19 +135,19 @@ public class SqlParameterMap extends ParameterLinkedHashMap {
         setValue(SQL_DATA_MAPPINGS, dataMappings);
     }
     
-    public InputDataflowStreamProvider getCsvInput() {
-        return (InputDataflowStreamProvider) getValue(SQL_CSV_INPUT_FIELDNAME);
+    public URI getCsvInput() {
+        return (URI) getValue(SQL_CSV_INPUT_FIELDNAME);
     }
     
-    public void setCsvInput(InputDataflowStreamProvider csvInput) {
+    public void setCsvInput(URI csvInput) {
         setValue(SQL_CSV_INPUT_FIELDNAME, csvInput);
     }
     
-    public OutputDataflowStreamProvider getCsvOutput() {
-        return (OutputDataflowStreamProvider) getValue(SQL_CSV_OUTPUT_FIELDNAME);
+    public URI getCsvOutput() {
+        return (URI) getValue(SQL_CSV_OUTPUT_FIELDNAME);
     }
     
-    public void setCsvOutput(OutputDataflowStreamProvider csvOutput) {
+    public void setCsvOutput(URI csvOutput) {
         setValue(SQL_CSV_OUTPUT_FIELDNAME, csvOutput);
     }
     

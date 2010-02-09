@@ -24,7 +24,7 @@ public class FtpServiceImpl implements NexusService {
             FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
             FileObject source = manager.resolveFile(data.getInput().toString());
             FileObject dest = manager.resolveFile(data.getRemoteFileSpec());
-            dest.copyFrom(source,Selectors.SELECT_SELF);
+            dest.copyFrom(source, Selectors.SELECT_SELF);
         } catch (Exception e) {
             logger.error("FTP Service error!", e);
             throw new NexusServiceException("Error in FTP service!", e, data, false);

@@ -11,6 +11,16 @@
     <name>nexusBPM services :: R</name>
     <dependencies>
         <dependency>
+            <groupId>RoSuDA</groupId>
+            <artifactId>REngine</artifactId>
+            <version>0.6-0</version>
+        </dependency>
+        <dependency>
+            <groupId>RoSuDA</groupId>
+            <artifactId>Rserve</artifactId>
+            <version>0.6-0</version>
+        </dependency>
+        <dependency>
             <groupId>nexusbpm</groupId>
             <artifactId>nexusbpm.common</artifactId>
         </dependency>
@@ -61,6 +71,10 @@
         <repository>
             <id>maven2</id>
             <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>RServe</id>
+            <url>http://www.chibi.ubc.ca/maven2</url>
         </repository>
     </repositories>
 </project>

@@ -24,12 +24,11 @@ public class EmailServiceTest extends NexusTestCase {
         data.setProcessName("test");
         data.setRequestId("1-100");
         data.setSubject("test from EmailServiceTest");
-        URI path = URI.create("ftp://" + InetAddress.getLocalHost().getHostAddress() + "/jbpm/work/local-in.csv");
-//        InputDataflowStreamProvider provider = DataflowStreamProviderFactory.getInstance().getInputProvider(path);
+        URI path = URI.create("res:testfile.xml");
         attachment = new Parameter("myfile", "", "", ParameterType.ASCII_FILE, path, false, Parameter.DIRECTION_INPUT);
     }
 
-    @Test
+//    @Test
     public void testIntranetSend() throws Exception {//only works from our intranet
         data.setBody("Body for <i>Email</i>ServiceTest");
         data.setFromAddress(getProperty("test.email.intranet.fromAddress"));
@@ -50,12 +49,13 @@ public class EmailServiceTest extends NexusTestCase {
         data.setUsername(getProperty("test.email.gmail.user"));
         data.setPassword(getProperty("test.email.gmail.password"));
         data.setSecure(Boolean.TRUE);
+        data.setToAddress(getProperty("test.email.gmail.recipient"));
         data.put(attachment);
         EmailSenderServiceImpl service = new EmailSenderServiceImpl();
         service.execute(data);
     }
 
-    @Test
+//    @Test
     public void testGoDaddy() throws Exception {//only works with a godaddy account
         data.setHost("smtpout.secureserver.net");
         data.setPort("3535");

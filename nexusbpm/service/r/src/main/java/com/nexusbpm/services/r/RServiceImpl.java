@@ -11,25 +11,32 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 
-import org.rosuda.JRclient.REXP;
-import org.rosuda.JRclient.RSession;
-import org.rosuda.JRclient.RSrvException;
-import org.rosuda.JRclient.Rconnection;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.Rserve.RSession;
+import org.rosuda.REngine.Rserve.RserveException;
+import org.rosuda.REngine.Rserve.RConnection;
 
 import com.nexusbpm.common.data.Parameter;
 import com.nexusbpm.common.data.ParameterMap;
-import com.nexusbpm.common.io.interfaces.InputDataflowStreamProvider;
-import com.nexusbpm.common.io.interfaces.OutputDataflowStreamProvider;
-import com.nexusbpm.common.util.ObjectConverter;
-import com.nexusbpm.services.AbstractNexusService;
+import com.nexusbpm.common.data.ObjectConverter;
+import com.nexusbpm.services.NexusService;
 import com.nexusbpm.services.NexusServiceException;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileUtil;
+import org.apache.commons.vfs.VFS;
+import org.rosuda.REngine.REXPMismatchException;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class RServiceImpl extends AbstractNexusService {
+public class RServiceImpl implements NexusService {
+
+    public static final Logger logger = LoggerFactory.getLogger(RServiceImpl.class);
+
     public ParameterMap execute(ParameterMap data) throws NexusServiceException {
         StringBuilder result = new StringBuilder("R service call results:\n");
         RParameterMap rData = new RParameterMap(data);
         RSession session = null;
-        Rconnection c = null;
+        RConnection c = null;
         Exception ex = null;
         try {
             rData.setOutput("");
@@ -48,46 +55,23 @@ public class RServiceImpl extends AbstractNexusService {
             }
             // connect to Rserve if we didn't attach to a session yet
             if(c == null)
-                c = new Rconnection(rData.getServerAddress());
+                c = new RConnection(rData.getServerAddress());
             // assign any necessary data from incoming attributes
             result.append("Input Parameters: \n");
             for(String attributeName : rData.keySet()) {
                 Parameter parameter = rData.get(attributeName);
                 if(!parameter.isRequired()) {
                     if(parameter.isFile()) {
-//                        DataflowStreamProviderFactory factory = DataflowStreamProviderFactory.getInstance();
                         if(parameter.isInput()) {
-                            InputDataflowStreamProvider provider = (InputDataflowStreamProvider) parameter.getValue();
-//                            InputStream istream = factory.getInputProvider((URI) parameter.getValue()).getInputStream(parameter.isAsciiFile());
-                            InputStream istream = provider.getInputStream(parameter.isAsciiFile());
-//                            String outname = new File(factory.getLocalFilename((URI) provider.getURI())).getName();
-                            URI uri = provider.getURI();
-                            String outname = null;
-                            if(uri.getPath() != null && uri.getPath().length() > 0) {
-                                outname = uri.getPath();
-                            } else {
-                                outname = uri.toString();
-                            }
-                            if(outname.indexOf('/') >= 0) {
-                                outname = outname.substring(outname.lastIndexOf('/') + 1);
-                            }
-                            if(outname.length() == 0) {
-                                throw new IllegalArgumentException(parameter.toString() + " (" + uri + ")");
-                            }
-                            OutputStream ostream = c.createFile(outname);
-                            copyStream(istream, ostream);
+                            FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
+                            OutputStream ostream = c.createFile(file.getName().getBaseName());
+                            FileUtil.writeContent(file, ostream);
                             result.append("  " + parameter.getType().getName() + " " + attributeName + "="
-                                    + parameter.getValue() + " mapped to " + outname + "\n");
-                            c.assign(attributeName, outname);
+                                    + parameter.getValue() + " mapped to " + file.getName().getBaseName() + "\n");
+                            c.assign(attributeName, file.getName().getBaseName());
                         } else {
-                            OutputDataflowStreamProvider provider = (OutputDataflowStreamProvider) parameter.getValue();
-//                            String outname = parameter.getValue().toString();
-//                            String outname = new File(factory.getLocalFilename((URI) provider.getURI())).getName();
-                            String outname = provider.getURI().toString();
-                            if(outname.indexOf('/') > -1) {
-                                outname = outname.substring(outname.lastIndexOf('/') + 1);
-                            }
-                            c.assign(attributeName, outname);
+                            FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
+                            c.assign(attributeName, file.getName().getBaseName());
                         }
                     } else if(parameter.isInput()) {
                         result.append("  " + parameter.getType().getName() + " " + attributeName + "=" + parameter.getValue() + "\n");
@@ -108,7 +92,7 @@ public class RServiceImpl extends AbstractNexusService {
             }
             REXP x = c.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
             result.append("Execution results:\n" + x.asString() + "\n");
-            if(x.getAttribute() != null || x.asString().startsWith("Error")) {
+            if(x.isNull() || x.asString().startsWith("Error")) {
                 // only error has an attribute (the class)
                 rData.setError(x.asString());
                 // what should we do after an error?
@@ -129,15 +113,11 @@ public class RServiceImpl extends AbstractNexusService {
                     Object o = RUtils.convertREXP(var, parameter.getType().getJavaClass());
                     if(parameter.isFile()) {
                         // outputting to a file
-                        InputStream istream = c.openFile(var.getContent().toString());
-//                        DataflowStreamPr oviderFactory factory = DataflowStreamProviderFactory.getInstance();
-//                        OutputDataflowStreamProvider oprovider = factory.getOutputProvider(R_SERVICE_NAME, rData
-//                                .getProcessName(), rData.getProcessVersion(), rData.getRequestId(), var.getContent()
-//                                .toString());
-                        OutputDataflowStreamProvider oprovider = (OutputDataflowStreamProvider) parameter.getValue();
-                        OutputStream ostream = oprovider.getOutputStream(parameter.isAsciiFile());
+                        InputStream istream = c.openFile(var.asString());
+                        FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
+                        OutputStream ostream = file.getContent().getOutputStream();
                         copyStream(istream, ostream);
-                        rData.get(attributeName).setValue(oprovider.getURI());
+                        rData.get(attributeName).setValue(((URI) parameter.getValue()).toString());
                         result.append("  " + attributeName + "=" + rData.get(attributeName).getValue() + "\n");
                     } else {
                         rData.get(attributeName).setValue(
@@ -148,7 +128,10 @@ public class RServiceImpl extends AbstractNexusService {
                     result.append("Missing Output Variable " + attributeName + "\n");
                 }
             }
-        } catch(RSrvException re) {
+        } catch(REXPMismatchException rme) {
+            rData.setError(rme.getMessage());
+            ex = rme;
+        } catch(RserveException re) {
             rData.setError(re.getRequestErrorDescription());
             ex = re;
         } catch (Exception e) {
@@ -165,8 +148,8 @@ public class RServiceImpl extends AbstractNexusService {
                         rData.isKeepSession().booleanValue()) {
                     try {
                         outSession = c.detach();
-                    } catch(RSrvException e) {
-                        LOG.debug("Error detaching R session", e);
+                    } catch(RserveException e) {
+                        logger.debug("Error detaching R session", e);
                     }
                 }
                 boolean close = outSession == null;

@@ -25,19 +25,24 @@ import java.util.Properties;
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import com.nexusbpm.common.data.ParameterMap;
-import com.nexusbpm.common.io.interfaces.OutputDataflowStreamProvider;
 import com.nexusbpm.common.util.ObjectConversionException;
-import com.nexusbpm.common.util.ObjectConverter;
-import com.nexusbpm.services.AbstractNexusService;
+import com.nexusbpm.common.data.ObjectConverter;
+import com.nexusbpm.services.NexusService;
 import com.nexusbpm.services.NexusServiceException;
+import java.io.InputStream;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.VFS;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class SqlServiceImpl extends AbstractNexusService {
+public class SqlServiceImpl implements NexusService {
     public static final String SQL_STATEMENT_TYPE_AUTO_COMMIT_IGNORE_ERRORS = "Auto Commit and Ignore Errors";
     public static final String SQL_STATEMENT_TYPE_QUERY = "Query";
     public static final String SQL_STATEMENT_TYPE_DML = "Insert, Update, or Delete";
     public static final String SQL_STATEMENT_TYPE_DDL = "Data Definition Language (DDL)";
     public static final String SQL_STATEMENT_TYPE_BATCH_INSERT = "Batch Insert";
-    
+    public static final Logger logger = LoggerFactory.getLogger(SqlServiceImpl.class);
+
     public ParameterMap execute(ParameterMap data) throws NexusServiceException {
         Connection connection = null;
         SqlParameterMap sData = new SqlParameterMap(data);
@@ -78,14 +83,14 @@ public class SqlServiceImpl extends AbstractNexusService {
 //            throw e;
         } catch (Exception e) {
             sData.setError(e.getMessage());
-            LOG.error("Error in sql statement", e);
+            logger.error("Error in sql statement", e);
             throw new NexusServiceException("Error in SQL service!", e, sData, false);
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch(SQLException e) {
-                    LOG.debug("Error closing SQL connection", e);
+                    logger.debug("Error closing SQL connection", e);
                 }
             }
         }
@@ -235,7 +240,7 @@ public class SqlServiceImpl extends AbstractNexusService {
                     pw.println(statements[index]);
                     pw.println(e.toString());
                     pw.println();
-                    LOG.debug("Error in SQL statement ignored", e);
+                    logger.debug("Error in SQL statement ignored", e);
                 }
             }
             sData.setError(sw.toString());
@@ -318,13 +323,13 @@ public class SqlServiceImpl extends AbstractNexusService {
 //            filename = filename.substring(filename.indexOf('/') + 1);
 //        }
 //      OutputDataflowStreamProvider provider = getOutputStreamProvider(sData, filename);
-        OutputDataflowStreamProvider provider = sData.getCsvOutput();
+        FileObject file = VFS.getManager().resolveFile(sData.getCsvOutput().toString());
         String columnNames[] = new String[rsmd.getColumnCount()];
         for (int column = 1; column <= rsmd.getColumnCount(); column++) {
             columnNames[column - 1] = rsmd.getColumnName(column);
         }
         try {
-            ostream = provider.getOutputStream(true);
+            ostream = file.getContent().getOutputStream();
             csvPrinter = new CSVPrinter(new BufferedWriter(new OutputStreamWriter(ostream)));
             csvPrinter.println(columnNames);
             String columnValues[] = new String[rsmd.getColumnCount()];
@@ -352,7 +357,7 @@ public class SqlServiceImpl extends AbstractNexusService {
                                 value = o;
                             }
                         } catch(ObjectConversionException e) {
-                            LOG.debug("error converting " + value, e);
+                            logger.debug("error converting " + value, e);
                         }
                     }
                     columnValues[column - 1] = value == null ? "" : value.toString();
@@ -404,7 +409,9 @@ public class SqlServiceImpl extends AbstractNexusService {
         
         try {
             // read in the column names from the CSV
-            parser = new CSVParser(data.getCsvInput().getInputStream(true));
+            FileObject file = VFS.getManager().resolveFile(data.getCsvInput().toString());
+            InputStream istream = file.getContent().getInputStream();
+            parser = new CSVParser(istream);
             csvColumns = parser.getLine();
             
             String sql = "insert into " + data.getTableName() + " (";
@@ -449,7 +456,7 @@ public class SqlServiceImpl extends AbstractNexusService {
                     Class c = Class.forName(cname);
                     types.put(name, c);
                 } catch(Exception e) {
-                    LOG.debug("Column " + index + " (" + name + ") is of type " + cname, e);
+                    logger.debug("Column " + index + " (" + name + ") is of type " + cname, e);
                 }
             }
             

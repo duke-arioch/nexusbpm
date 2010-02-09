@@ -1,6 +1,8 @@
 package com.nexusbpm.services.r;
 
-import org.rosuda.JRclient.REXP;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.protocol.REXPFactory;
 
 public class RUtils {
 
@@ -41,20 +43,21 @@ public class RUtils {
 				+ " },silent=FALSE)); if (any(class(.result)=='try-error')) .result else paste(.output, collapse='\n') }";
 	}
 
-	public static Object convertREXP(REXP rexp, Class toClass) {
+	public static Object convertREXP(REXP rexp, Class toClass) throws REXPMismatchException{
 		Object retval = null;
-		switch (rexp.getType()) {
-		case REXP.XT_ARRAY_INT:
-		case REXP.XT_INT:
-			retval = new Integer(rexp.asInt());
-			break;
-		case REXP.XT_ARRAY_DOUBLE:
-		case REXP.XT_DOUBLE:
-			retval = new Double(rexp.asDouble());
-			break;
-		case REXP.XT_STR:
-			retval = rexp.asString();
-		}
+                if (rexp.isInteger() && rexp.isList()) {
+                        retval = new Integer(rexp.asInteger());
+                } else if (rexp.isInteger() && !rexp.isList()) {
+                        retval = new Integer(rexp.asInteger());
+                } else if (rexp.isNumeric() && !rexp.isList()) {
+                        retval = new Double(rexp.asDouble());
+                } else if (rexp.isNumeric() && rexp.isList()) {
+                        retval = new Double(rexp.asDouble());
+                } else if (rexp.isString() && rexp.isList()) {
+                        retval = rexp.asString();
+                } else if (rexp.isNumeric() && rexp.isList()) {
+                        retval = rexp.asString();
+                }
 		return retval;
 	}
 
