@@ -80,11 +80,4 @@ public class NexusServiceException extends Exception {
         }
     }
     
-    @Override
-    public String toString() {
-        if(causeStacktrace != null) {
-            return causeStacktrace + "Caused:\n" + super.toString();
-        }
-        return super.toString();
-    }
 }

@@ -1,11 +1,9 @@
 package com.nexusbpm.services.ftp;
 
-import java.io.OutputStream;
 import java.net.URI;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileSystemOptions;
-import org.apache.commons.vfs.FileUtil;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.ftp.FtpFileSystemConfigBuilder;
@@ -14,10 +12,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.slf4j.Logger;
@@ -49,24 +45,16 @@ public class FtpServiceTest {
 
     @Test
     public void testRoundtrip() throws Exception {
-        FileSystemManager manager = VFS.getManager();
-        FileSystemOptions opts = new FileSystemOptions();
-        FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
-        FileObject source = manager.resolveFile("res:testfile.xml");
-        FileObject dest = manager.resolveFile("ftp://nexusbpm:nexusbpm@localhost//tmp/testout.xml");
-        dest.copyFrom(source,Selectors.SELECT_SELF);
+        FtpServiceImpl service = new FtpServiceImpl();
+        FtpParameterMap data = new FtpParameterMap();
+        data.setInput(new URI("res:testfile.xml"));
+        data.setOutput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
+        FtpParameterMap outData = (FtpParameterMap) service.execute(data);
 
+        data.setInput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
+        data.setOutput(new URI("tmp://testfile.out.xml"));
+        outData = (FtpParameterMap) service.execute(data);
 
-//        FtpServiceImpl service = new FtpServiceImpl();
-//        FtpParameterMap data = new FtpParameterMap();
-//        data.setInput(new URI("res:testfile.xml"));
-//        data.setOutput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
-//
-//        FtpParameterMap outData = (FtpParameterMap) service.execute(data);
-//
-//        data.setInput(new URI("ftp://nexusbpm@localhost/remotefile.xml"));
-//        data.setOutput(new URI("tmp://testfile.out.xml"));
-//
-//        System.out.println(outData);
+        System.out.println(outData);
     }
 }

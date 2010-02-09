@@ -98,9 +98,6 @@ public class SqlServiceTest {
         data.setUserName("");
         data.setPassword("");
         data.setSqlCode("create table TEST_DROP (COL CHAR(1))");
-        data.setProcessName("test1");
-        data.setProcessVersion("1");
-        data.setRequestId("1000");
         data.setCsvOutput(new URI("tmp:temp.csv"));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_DDL);
         SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
