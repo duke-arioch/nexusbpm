@@ -7,10 +7,12 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import com.nexusbpm.common.NexusTestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-//TODO 
+public class SqlServiceTest {
 
-public class SqlServiceTest extends NexusTestCase {
+    @Test
     public void testQuery() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
@@ -22,18 +24,14 @@ public class SqlServiceTest extends NexusTestCase {
         data.setProcessName("test1");
         data.setProcessVersion("1");
         data.setRequestId("1000");
-        data.setCsvOutput(DataflowStreamProviderFactory.getInstance().getOutputProvider(
-                "nexus/SQLService",
-                "test.csv",
-                data.getProcessName(),
-                data.getProcessVersion(),
-                data.getRequestId()));
+        data.setCsvOutput(new URI("tmp:temp.csv"));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
         SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
         System.out.println(outputData.getError());
-        System.out.println(outputData.getCsvOutput().getURI());
+        System.out.println(outputData.getCsvOutput().toString());
     }
     
+    @Test
     public void testMultiQuery() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap map = new SqlParameterMap();
@@ -42,34 +40,23 @@ public class SqlServiceTest extends NexusTestCase {
         map.setUserName("jbpm");
         map.setPassword("jbpm");
         map.setSqlCode("select * from jbpm_log where id_ < 100;select * from jbpm_node;");
-        ByteArrayOutputStreamProvider out = new ByteArrayOutputStreamProvider(
-                ByteArrayOutputStreamProvider.ASCII_SUPPORTED);
-        map.setCsvOutput(out);
+        map.setCsvOutput(new URI("tmp:temp.csv"));
         map.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
         SqlParameterMap output = (SqlParameterMap) c.execute(map);
         System.err.println(output.getError());
-        System.out.println(new String(out.getBytes()));
     }
     
     public void testMultiQuery2() throws Exception {
         InputStream is = null;
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ByteArrayOutputStreamProvider provider = new ByteArrayOutputStreamProvider(
-                    ByteArrayOutputStreamProvider.ASCII_UNIX);
-            is = getClass().getResourceAsStream("/code2.sql");
-            int b;
-            while((b = is.read()) != -1) {
-                out.write(b);
-            }
             SqlServiceImpl c = new SqlServiceImpl();
             SqlParameterMap map = new SqlParameterMap();
             map.setJdbcDriverClass("org.postgresql.Driver");
             map.setJdbcUri("jdbc:postgresql:jbpm");
             map.setUserName("jbpm");
             map.setPassword("jbpm");
-            map.setSqlCode(new String(out.toByteArray()));
-            map.setCsvOutput(provider);
+            map.setSqlCode("select x;select x;");
+            map.setCsvOutput(new URI("tmp:temp.csv"));
             map.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
             SqlParameterMap output = (SqlParameterMap) c.execute(map);
             System.err.println(output.getError());
@@ -78,7 +65,7 @@ public class SqlServiceTest extends NexusTestCase {
                 "2,another value'\n" +
                 "3,a third ' value\n" +
                 "4,value four\n";
-            String actual = new String(provider.getBytes());
+            String actual = "";
             System.out.println(actual);
             assertEquals(expected, actual);
         } finally {
@@ -102,12 +89,6 @@ public class SqlServiceTest extends NexusTestCase {
         data.setProcessName("test1");
         data.setProcessVersion("1");
         data.setRequestId("1000");
-        data.setCsvOutput(DataflowStreamProviderFactory.getInstance().getOutputProvider(
-                "nexus/SQLService",
-                "test.csv",
-                data.getProcessName(),
-                data.getProcessVersion(),
-                data.getRequestId()));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_DML);
         SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
         assertEquals(new Integer(1), outputData.getRecordCount());
@@ -115,7 +96,7 @@ public class SqlServiceTest extends NexusTestCase {
         outputData = (SqlParameterMap) c.execute(data);
         assertEquals(new Integer(1), outputData.getRecordCount());
         System.out.println(outputData.getError());
-        System.out.println(outputData.getCsvOutput().getURI());
+        System.out.println(outputData.getCsvOutput());
     }
     
     public void testDDL() throws Exception {
@@ -129,33 +110,15 @@ public class SqlServiceTest extends NexusTestCase {
         data.setProcessName("test1");
         data.setProcessVersion("1");
         data.setRequestId("1000");
-        data.setCsvOutput(DataflowStreamProviderFactory.getInstance().getOutputProvider(
-                "nexus/SQLService",
-                "test.csv",
-                data.getProcessName(),
-                data.getProcessVersion(),
-                data.getRequestId()));
+        data.setCsvOutput(new URI("tmp:temp.csv"));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_DDL);
         SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
         System.out.println(outputData.getError());
-        System.out.println(outputData.getCsvOutput().getURI());
+        System.out.println(outputData.getCsvOutput());
         assertTrue(outputData.getError() == null || outputData.getError().equals(""));
         data.setSqlCode("drop table TEST_DROP");
         outputData = (SqlParameterMap) c.execute(data);
         assertTrue(outputData.getError() == null || outputData.getError().equals(""));
-    }
-    
-    public void xtestOracleRun() throws Exception {
-        SqlParameterMap data = new SqlParameterMap();
-        data.setJdbcDriverClass("oracle.jdbc.driver.OracleDriver");
-        data.setJdbcUri(getProperty("test.sql.uri"));
-        data.setUserName(getProperty("test.sql.user"));
-        data.setPassword(getProperty("test.sql.password"));
-        data.setSqlCode(getProperty("test.sql.select"));
-        SqlServiceImpl c = new SqlServiceImpl();
-        SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
-        System.out.println(outputData.getError());
-        System.out.println(outputData.getCsvOutput());
     }
     
     public void testBatchInsert() throws Exception {
@@ -184,33 +147,13 @@ public class SqlServiceTest extends NexusTestCase {
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_BATCH_INSERT);
         data.setTableName("testtable");
         data.setDataMappings("id,id_,date,date_,amount,amt_,name,name_");
-        data.setCsvInput(new LocalResourceInputStreamProvider(this, "/data.csv"));
-        
+        data.setCsvInput(new URI("res:data.csv"));
         svc.execute(data);
         
         // retrieve the data through a SQL query and put it in a byte array
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         data = getHypersonicParameterMap();
-        data.setCsvOutput(new OutputDataflowStreamProvider() {
-            public OutputStream getOutputStream(boolean asciiMode) throws IOException {
-                if(asciiMode) {
-                    return new EOLOutputStream(baos);
-                }
-                return baos;
-            }
-            public void setAppendMode(boolean isAppendMode) {
-                throw new UnsupportedOperationException();
-            }
-            public boolean fileExists() throws IOException {
-                return true;
-            }
-            public URI getURI() {
-                return URI.create(baos.toString());
-            }
-            public boolean isLocal() {
-                return false;
-            }
-        });
+        data.setCsvOutput(new URI("tmp://temp.csv"));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
         data.setSqlCode("select id_, date_, amt_, name_ from testtable;");
         

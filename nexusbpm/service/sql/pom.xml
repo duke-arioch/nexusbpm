@@ -11,6 +11,11 @@
     <name>nexusBPM services :: SQL</name>
     <dependencies>
         <dependency>
+          <groupId>org.apache.derby</groupId>
+          <artifactId>derby</artifactId>
+          <version>10.5.3.0_1</version>
+        </dependency>
+        <dependency>
             <groupId>org.ostermiller</groupId>
             <artifactId>utils</artifactId>
             <version>1.07.00</version>
