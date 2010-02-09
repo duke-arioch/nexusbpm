@@ -28,62 +28,53 @@ public class SqlServiceTest {
         System.out.println(outputData.getCsvOutput().toString());
     }
     
-//    @Test
+    @Test
     public void testMultiQuery() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
-        SqlParameterMap map = new SqlParameterMap();
-        map.setJdbcDriverClass("org.postgresql.Driver");
-        map.setJdbcUri("jdbc:postgresql:jbpm");
-        map.setUserName("jbpm");
-        map.setPassword("jbpm");
-        map.setSqlCode("select * from jbpm_log where id_ < 100;select * from jbpm_node;");
-        map.setCsvOutput(new URI("tmp:temp.csv"));
-        map.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
-        SqlParameterMap output = (SqlParameterMap) c.execute(map);
+        SqlParameterMap data = new SqlParameterMap();
+        data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
+        data.setJdbcUri("jdbc:derby:memory:unit-testing;create=true");
+        data.setUserName("");
+        data.setPassword("");
+        data.setSqlCode("SELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1;SELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1");
+        data.setCsvOutput(new URI("tmp:temp.csv"));
+        data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
+        SqlParameterMap output = (SqlParameterMap) c.execute(data);
         System.err.println(output.getError());
     }
     
 //    @Test
     public void testMultiQuery2() throws Exception {
         InputStream is = null;
-        try {
-            SqlServiceImpl c = new SqlServiceImpl();
-            SqlParameterMap map = new SqlParameterMap();
-            map.setJdbcDriverClass("org.postgresql.Driver");
-            map.setJdbcUri("jdbc:postgresql:jbpm");
-            map.setUserName("jbpm");
-            map.setPassword("jbpm");
-            map.setSqlCode("select x;select x;");
-            map.setCsvOutput(new URI("tmp:temp.csv"));
-            map.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
-            SqlParameterMap output = (SqlParameterMap) c.execute(map);
-            System.err.println(output.getError());
-            String expected = "key_,name_\n" +
-                "1,Value number; 1\n" +
-                "2,another value'\n" +
-                "3,a third ' value\n" +
-                "4,value four\n";
-            String actual = "";
-            System.out.println(actual);
-            assertEquals(expected, actual);
-        } finally {
-            if(is != null) {
-                try {
-                    is.close();
-                } catch(Exception e) {
-                }
-            }
-        }
+        SqlServiceImpl c = new SqlServiceImpl();
+        SqlParameterMap data = new SqlParameterMap();
+        data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
+        data.setJdbcUri("jdbc:derby:memory:unit-testing;create=true");
+        data.setUserName("");
+        data.setPassword("");
+        data.setSqlCode("select x;select x;");
+        data.setCsvOutput(new URI("tmp:temp.csv"));
+        data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
+        SqlParameterMap output = (SqlParameterMap) c.execute(data);
+        System.err.println(output.getError());
+        String expected = "key_,name_\n" +
+            "1,Value number; 1\n" +
+            "2,another value'\n" +
+            "3,a third ' value\n" +
+            "4,value four\n";
+        String actual = "";
+        System.out.println(actual);
+        assertEquals(expected, actual);
     }
     
 //    @Test
     public void testDML() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
-        data.setJdbcDriverClass("org.postgresql.Driver");
-        data.setJdbcUri("jdbc:postgresql:jbpm");
-        data.setUserName("jbpm");
-        data.setPassword("jbpm");
+        data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
+        data.setJdbcUri("jdbc:derby:memory:unit-testing;create=true");
+        data.setUserName("");
+        data.setPassword("");
         data.setSqlCode("insert into jbpm_id_group values(-1, 'G', 'testgroup', 'organization', NULL)");
         data.setProcessName("test1");
         data.setProcessVersion("1");
@@ -98,14 +89,14 @@ public class SqlServiceTest {
         System.out.println(outputData.getCsvOutput());
     }
     
-//    @Test
+    @Test
     public void testDDL() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
-        data.setJdbcDriverClass("org.postgresql.Driver");
-        data.setJdbcUri("jdbc:postgresql:jbpm");
-        data.setUserName("jbpm");
-        data.setPassword("jbpm");
+        data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
+        data.setJdbcUri("jdbc:derby:memory:unit-testing;create=true");
+        data.setUserName("");
+        data.setPassword("");
         data.setSqlCode("create table TEST_DROP (COL CHAR(1))");
         data.setProcessName("test1");
         data.setProcessVersion("1");
