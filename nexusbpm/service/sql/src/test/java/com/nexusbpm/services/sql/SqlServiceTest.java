@@ -16,14 +16,11 @@ public class SqlServiceTest {
     public void testQuery() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
-        data.setJdbcDriverClass("org.postgresql.Driver");
-        data.setJdbcUri("jdbc:postgresql:jbpm");
-        data.setUserName("jbpm");
-        data.setPassword("jbpm");
-        data.setSqlCode("select * from jbpm_id_user");
-        data.setProcessName("test1");
-        data.setProcessVersion("1");
-        data.setRequestId("1000");
+        data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
+        data.setJdbcUri("jdbc:derby:memory:unit-testing;create=true");
+        data.setUserName("");
+        data.setPassword("");
+        data.setSqlCode("SELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1");
         data.setCsvOutput(new URI("tmp:temp.csv"));
         data.setStatementType(SqlServiceImpl.SQL_STATEMENT_TYPE_QUERY);
         SqlParameterMap outputData = (SqlParameterMap) c.execute(data);
@@ -31,7 +28,7 @@ public class SqlServiceTest {
         System.out.println(outputData.getCsvOutput().toString());
     }
     
-    @Test
+//    @Test
     public void testMultiQuery() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap map = new SqlParameterMap();
@@ -46,6 +43,7 @@ public class SqlServiceTest {
         System.err.println(output.getError());
     }
     
+//    @Test
     public void testMultiQuery2() throws Exception {
         InputStream is = null;
         try {
@@ -78,6 +76,7 @@ public class SqlServiceTest {
         }
     }
     
+//    @Test
     public void testDML() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
@@ -99,6 +98,7 @@ public class SqlServiceTest {
         System.out.println(outputData.getCsvOutput());
     }
     
+//    @Test
     public void testDDL() throws Exception {
         SqlServiceImpl c = new SqlServiceImpl();
         SqlParameterMap data = new SqlParameterMap();
@@ -121,6 +121,7 @@ public class SqlServiceTest {
         assertTrue(outputData.getError() == null || outputData.getError().equals(""));
     }
     
+//    @Test
     public void testBatchInsert() throws Exception {
         SqlServiceImpl svc = new SqlServiceImpl();
         
