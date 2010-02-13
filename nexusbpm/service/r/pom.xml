@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>nexusbpm</groupId>
-        <artifactId>nexusbpm.service</artifactId>
+        <artifactId>service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>nexusbpm</groupId>
-    <artifactId>r</artifactId>
+    <groupId>nexusbpm.service</groupId>
+    <artifactId>nexusbpm.service.r</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>nexusBPM services :: R</name>
+    <name>nexusBPM service :: R</name>
     <dependencies>
         <dependency>
             <groupId>RoSuDA</groupId>
@@ -25,8 +25,8 @@
             <artifactId>nexusbpm.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>nexusbpm</groupId>
-            <artifactId>service.common</artifactId>
+            <groupId>nexusbpm.service</groupId>
+            <artifactId>nexusbpm.service.common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

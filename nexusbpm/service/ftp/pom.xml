@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>nexusbpm</groupId>
-        <artifactId>nexusbpm.service</artifactId>
+        <artifactId>service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>nexusbpm</groupId>
-    <artifactId>ftp</artifactId>
+    <groupId>nexusbpm.service</groupId>
+    <artifactId>nexusbpm.service.ftp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>nexusBPM services :: FTP</name>
+    <name>nexusBPM service :: FTP</name>
     <dependencies>
         <dependency>
             <groupId>org.mockftpserver</groupId>
@@ -31,8 +31,8 @@
             <artifactId>nexusbpm.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>nexusbpm</groupId>
-            <artifactId>service.common</artifactId>
+            <groupId>nexusbpm.service</groupId>
+            <artifactId>nexusbpm.service.common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
