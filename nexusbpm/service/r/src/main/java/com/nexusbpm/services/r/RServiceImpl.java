@@ -185,7 +185,8 @@ public class RServiceImpl implements NexusService {
         }
         rData.setOutput(result.toString());
         if (ex != null) {
-            throw new NexusServiceException(ex, rData, false);
+            logger.error("R service error", ex);
+            throw new NexusServiceException("R service error", ex, rData);
         }
         return rData;
     }// run()

@@ -34,13 +34,11 @@ public class FtpServiceTest {
         fileSystem.add(new DirectoryEntry("/tmp"));
         ftpServer.setFileSystem(fileSystem);
         ftpServer.start();
-        logger.error("Started FTP Service");
     }
 
     @After
     public void after() throws Exception {
         ftpServer.stop();
-        logger.error("Stopped FTP Service");
     }
 
     @Test

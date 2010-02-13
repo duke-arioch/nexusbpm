@@ -6,28 +6,21 @@ import com.nexusbpm.common.NexusTestCase;
 import com.nexusbpm.common.data.Parameter;
 import com.nexusbpm.common.data.ParameterType;
 import com.nexusbpm.services.NexusServiceException;
+import java.net.URI;
 import junit.framework.Assert;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.VFS;
+import org.junit.Test;
 
 public class RServiceTest extends NexusTestCase {
     private String unique = "output-" + System.currentTimeMillis();
     
-    private void setSharedData(RParameterMap data) {
-        data.setServerAddress(getProperty("test.r.server"));
-        data.setRequestId(unique);
-        data.setProcessName("rprocess");
-        data.setProcessVersion("1");
-    }
-//    private OutputDataflowStreamProvider getOutputProvider(String filename) throws IOException{
-//        return DataflowStreamProviderFactory
-//        .getInstance()
-//        .getOutputProvider("nexus/RService", filename, "rtest", "12", "111");
-//    }
-    
+   
     private RParameterMap getPlotData() throws Exception {
         RParameterMap data = new RParameterMap();
-        setSharedData(data);
+        data.setServerAddress("localhost");
         data.put(new Parameter("radius", null, null, ParameterType.INT, new Integer(1000), false, Parameter.DIRECTION_INPUT_AND_OUTPUT));
-//        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, getOutputProvider("test.png"), false, Parameter.DIRECTION_OUTPUT));
+        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, new URI("tmp:test.png"), false, Parameter.DIRECTION_OUTPUT));
         data.setCode( 
             "t=seq(0,2*pi,length=10000);\n" +
             "png(filename=imageLocation, width=800, height=600, bg=\"grey\");\n" +
@@ -38,6 +31,7 @@ public class RServiceTest extends NexusTestCase {
         return data;
     }
     
+    @Test
     public void testRPlottingWithOutputGraph() throws Exception{
         RServiceImpl r = new RServiceImpl();
         RParameterMap data = (RParameterMap) r.execute(getPlotData());
@@ -46,8 +40,7 @@ public class RServiceTest extends NexusTestCase {
         System.out.println(data.getError());
         
         if (!"".equals(data.getError())) {
-            System.out.println("error: " + data.getError());
-            return;
+            Assert.fail("R command did not complete properly.");
         }
         else {
 //            System.out.println(data.get("imageLocation").getValue());
@@ -55,8 +48,12 @@ public class RServiceTest extends NexusTestCase {
 //            JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
         }
         Assert.assertEquals(1001, data.get("radius").getValue());
+        String uri = (String) data.get("imageLocation").getValue();
+        FileObject file = VFS.getManager().resolveFile(uri);
+        Assert.assertEquals(9585, file.getContent().getSize());
     }
     
+    @Test
     public void testRSyntaxExceptionHandling() throws Exception {
         RServiceImpl r = new RServiceImpl();
         RParameterMap data = new RParameterMap();
@@ -64,9 +61,6 @@ public class RServiceTest extends NexusTestCase {
         data.setServerAddress(getProperty("test.r.server"));
         try {
             data = (RParameterMap) r.execute(data);
-            System.out.println("Code:\n" + data.getCode());
-            System.out.println("Output:\n" + data.getOutput());
-            System.out.println("Error:\n" + data.getError());
             Assert.fail("Exception should have been thrown");
         } catch(NexusServiceException e) {
             e.printStackTrace(System.out);
@@ -75,7 +69,7 @@ public class RServiceTest extends NexusTestCase {
         System.out.println("Code:\n" + data.getCode());
         System.out.println("Output:\n" + data.getOutput());
         System.out.println("Error:\n" + data.getError());
-        Assert.assertTrue(data.getError().contains("Error in try({ : object \"xxx\" not found"));
+        Assert.assertTrue(data.getError().contains("Error in try({ : object 'xxx' not found"));
     }
     
 //	private RParameterMap getDBData() throws Exception {
@@ -97,7 +91,7 @@ public class RServiceTest extends NexusTestCase {
 //	}
     private RParameterMap get2WayData() throws Exception {
         RParameterMap data = new RParameterMap();
-        setSharedData(data);
+        data.setServerAddress("localhost");
 //        URI testUri = DataflowStreamProviderFactory.getInstance().getOutputProvider("testService", "testproc", "12", "111", "test.csv").getURI();
 //        data.put(new Parameter("file", null, null, ParameterType.ASCII_FILE, testUri, false, Parameter.DIRECTION_INPUT));
 //        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, URI.create("my2.png"), false, Parameter.DIRECTION_OUTPUT));
