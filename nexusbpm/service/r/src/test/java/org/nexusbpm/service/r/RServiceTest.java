@@ -12,8 +12,10 @@ import java.net.URI;
 import junit.framework.Assert;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class RServiceTest extends NexusTestCase {
     private String unique = "output-" + System.currentTimeMillis();
     

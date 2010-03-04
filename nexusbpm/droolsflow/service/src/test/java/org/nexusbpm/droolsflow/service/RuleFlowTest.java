@@ -17,6 +17,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -24,8 +25,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class RuleFlowTest {
 
-  private int script = 2;
-  private int email = 1;
+  private int script = 0;
+  private int email = 0;
 
   @Test
   public void testAFlow() throws Exception {
@@ -60,8 +61,8 @@ public class RuleFlowTest {
     HashMap map = new HashMap<String, Object>();
     map.put("names", Arrays.asList(new String[]{"Bill", "John"}));
     ksession.startProcess("com.sample.ruleflow", map);
-    assertThat("email should be invoked once", email, equalTo(1));
     assertThat("script should be invoked twice", script, equalTo(2));
+    assertThat("email should be invoked once", email, equalTo(1));
   }
 
   private static KnowledgeBase readKnowledgeBase() throws Exception {
