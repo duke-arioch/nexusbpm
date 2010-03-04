@@ -14,5 +14,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>service</module>
+    <module>designer</module>
   </modules>
 </project>
