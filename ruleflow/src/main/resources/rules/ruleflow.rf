@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="ruleflow" id="com.sample.ruleflow" package-name="com.sample" routerLayout="1" >
+
+  <header>
+    <variables>
+      <variable name="names" >
+        <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.List" />
+      </variable>
+      <variable name="name" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+    </variables>
+  </header>
+
+  <nodes>
+    <start id="1" name="Start" x="16" y="110" width="80" height="40" />
+    <end id="3" name="End" x="657" y="110" width="80" height="40" />
+    <workItem id="6" name="Email Sender" x="128" y="110" width="80" height="40" >
+      <work name="Email Sender" >
+        <parameter name="Attachments" >
+          <type name="org.drools.process.core.datatype.impl.type.ListDataType" className="java.util.List" />
+        </parameter>
+        <parameter name="BCC" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Body" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="CC" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="From" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="HTML" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Host" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Password" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Port" >
+          <type name="org.drools.process.core.datatype.impl.type.IntegerDataType" />
+        </parameter>
+        <parameter name="SSL" >
+          <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        </parameter>
+        <parameter name="Subject" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="To" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="User" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+      </work>
+    </workItem>
+    <forEach id="7" name="ForEach" x="240" y="16" width="385" height="229" variableName="name" collectionExpression="names" >
+      <nodes>
+    <workItem id="17" name="Script" x="79" y="75" >
+      <work name="Script" >
+        <parameter name="Code" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Dialect" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Error" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+        <parameter name="Output" >
+          <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+        </parameter>
+      </work>
+    </workItem>
+      </nodes>
+      <connections>
+      </connections>
+      <in-ports>
+        <in-port type="DROOLS_DEFAULT" nodeId="17" nodeInType="DROOLS_DEFAULT" />
+      </in-ports>
+      <out-ports>
+        <out-port type="DROOLS_DEFAULT" nodeId="17" nodeOutType="DROOLS_DEFAULT" />
+      </out-ports>
+    </forEach>
+  </nodes>
+
+  <connections>
+    <connection from="7" to="3" />
+    <connection from="1" to="6" />
+    <connection from="6" to="7" />
+  </connections>
+
+</process>
