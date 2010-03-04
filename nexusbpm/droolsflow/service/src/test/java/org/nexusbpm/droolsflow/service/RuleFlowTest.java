@@ -17,7 +17,6 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;

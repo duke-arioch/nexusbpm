@@ -6,6 +6,6 @@ package org.nexusbpm.droolsflow.service;
  */
 public interface DroolsFlowExecutionService {
 
-  void run();
+  void run(String resourceId) throws Exception;
 
 }
