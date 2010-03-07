@@ -30,6 +30,8 @@ public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionServ
     KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
     StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+    //setup
+    //then some kind of spring-y way of setting up these workitem handlers...
     ksession.getWorkItemManager().registerWorkItemHandler("Email Sender",
             new WorkItemHandler() {
               @Override

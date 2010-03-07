@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class FtpServiceImpl implements NexusService {
 
-    public final static Logger logger = LoggerFactory.getLogger(FtpServiceImpl.class);
+    public final static Logger LOGGER = LoggerFactory.getLogger(FtpServiceImpl.class);
 
     public ParameterMap execute(ParameterMap inData) throws NexusServiceException {
         FtpParameterMap data = new FtpParameterMap(inData);
@@ -26,7 +26,7 @@ public class FtpServiceImpl implements NexusService {
             FileObject dest = manager.resolveFile(data.getOutput().toString());
             dest.copyFrom(source, Selectors.SELECT_SELF);
         } catch (Exception e) {
-            logger.error("FTP Service error!", e);
+            LOGGER.error("FTP Service error!", e);
             throw new NexusServiceException("Error in FTP service!", e, data, false);
         }
         return data;
