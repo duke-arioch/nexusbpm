@@ -16,12 +16,12 @@ public class RParameterMap extends ParameterLinkedHashMap {
 	static String R_SERVER_ADDRESS_FIELDNAME = "serverAddress";
 	static String R_SESSION_FIELDNAME = "session";
 
-	Parameter code = new Parameter(R_CODE_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-	Parameter output = new Parameter(R_OUTPUT_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
-	Parameter error = new Parameter(R_ERROR_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
-	Parameter keepSession = new Parameter(R_KEEP_SESSION_FIELDNAME, null, null, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
-	Parameter serverAddress = new Parameter(R_SERVER_ADDRESS_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-	Parameter session = new Parameter(R_SESSION_FIELDNAME, null, null, ParameterType.BINARY, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
+	Parameter code = new Parameter(R_CODE_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+	Parameter output = new Parameter(R_OUTPUT_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
+	Parameter error = new Parameter(R_ERROR_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
+	Parameter keepSession = new Parameter(R_KEEP_SESSION_FIELDNAME, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
+	Parameter serverAddress = new Parameter(R_SERVER_ADDRESS_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+	Parameter session = new Parameter(R_SESSION_FIELDNAME, ParameterType.BINARY, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
 	private Parameter[] parms = {code, output, error, keepSession, serverAddress, session};
 	
 	public RParameterMap() {

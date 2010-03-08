@@ -141,4 +141,7 @@ public class GroovyServiceImpl implements NexusService {
         assert value.equals(new Integer(20));
         assert binding.getVariable("x").equals(new Integer(123));
     }
+  public ParameterMap getMinimalParameterMap() {
+    return new GroovyParameterMap();
+  }
 }

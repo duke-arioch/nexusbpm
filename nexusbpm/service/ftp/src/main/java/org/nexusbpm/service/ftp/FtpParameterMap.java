@@ -26,14 +26,14 @@ public class FtpParameterMap extends ParameterLinkedHashMap {
     public static final String FTP_INPUT_FIELDNAME = "input";
     public static final String FTP_OUTPUT_FIELDNAME = "output";
     
-    Parameter operation = new Parameter(FTP_OPERATION_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter remoteDir = new Parameter(FTP_REMOTE_DIR_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter remoteFileSpec = new Parameter(FTP_REMOTE_FILE_SPEC_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter remoteHost = new Parameter(FTP_REMOTE_HOST_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter userId = new Parameter(FTP_USER_ID_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter userPassword = new Parameter(FTP_USER_PASSWORD_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter input = new Parameter(FTP_INPUT_FIELDNAME, null, null, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
-    Parameter output = new Parameter(FTP_OUTPUT_FIELDNAME, null, null, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_OUTPUT);
+    Parameter operation = new Parameter(FTP_OPERATION_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter remoteDir = new Parameter(FTP_REMOTE_DIR_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter remoteFileSpec = new Parameter(FTP_REMOTE_FILE_SPEC_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter remoteHost = new Parameter(FTP_REMOTE_HOST_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter userId = new Parameter(FTP_USER_ID_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter userPassword = new Parameter(FTP_USER_PASSWORD_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter input = new Parameter(FTP_INPUT_FIELDNAME, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
+    Parameter output = new Parameter(FTP_OUTPUT_FIELDNAME, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_OUTPUT);
     private Parameter[] parms = {operation, remoteDir, remoteFileSpec, remoteHost, userId, userPassword, input, output};
 
     public FtpParameterMap() {

@@ -23,18 +23,18 @@ public class SqlParameterMap extends ParameterLinkedHashMap {
     static String SQL_RECORD_COUNT_FIELDNAME = "recordCount";
     static String SQL_ERROR_FIELDNAME = "error";
     
-    Parameter jdbcDriverClass = new Parameter(SQL_JDBC_DRIVER_CLASS_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter jdbcUri = new Parameter(SQL_JDBC_URI_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter username = new Parameter(SQL_USER_NAME_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter password = new Parameter(SQL_PASSWORD_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter sqlCode = new Parameter(SQL_SQL_CODE_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter statementType = new Parameter(SQL_STATEMENT_TYPE_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-    Parameter dataMappings = new Parameter(SQL_DATA_MAPPINGS, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
-    Parameter tableName = new Parameter(SQL_TABLE_NAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
-    Parameter csvInput = new Parameter(SQL_CSV_INPUT_FIELDNAME, null, null, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
-    Parameter csvOutput = new Parameter(SQL_CSV_OUTPUT_FIELDNAME, null, null, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_OUTPUT);
-    Parameter recordCount = new Parameter(SQL_RECORD_COUNT_FIELDNAME, null, null, ParameterType.INT, null, true, Parameter.DIRECTION_OUTPUT);
-    Parameter error = new Parameter(SQL_ERROR_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
+    Parameter jdbcDriverClass = new Parameter(SQL_JDBC_DRIVER_CLASS_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter jdbcUri = new Parameter(SQL_JDBC_URI_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter username = new Parameter(SQL_USER_NAME_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter password = new Parameter(SQL_PASSWORD_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter sqlCode = new Parameter(SQL_SQL_CODE_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter statementType = new Parameter(SQL_STATEMENT_TYPE_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+    Parameter dataMappings = new Parameter(SQL_DATA_MAPPINGS, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
+    Parameter tableName = new Parameter(SQL_TABLE_NAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
+    Parameter csvInput = new Parameter(SQL_CSV_INPUT_FIELDNAME, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
+    Parameter csvOutput = new Parameter(SQL_CSV_OUTPUT_FIELDNAME, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_OUTPUT);
+    Parameter recordCount = new Parameter(SQL_RECORD_COUNT_FIELDNAME, ParameterType.INT, null, true, Parameter.DIRECTION_OUTPUT);
+    Parameter error = new Parameter(SQL_ERROR_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
     
     private Parameter[] parms = {
         jdbcDriverClass,

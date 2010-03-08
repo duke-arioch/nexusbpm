@@ -12,9 +12,9 @@ public class GroovyParameterMap extends ParameterLinkedHashMap {
 	String GROOVY_CODE_FIELDNAME = "code";
 	String GROOVY_OUTPUT_FIELDNAME = "output";
 	String GROOVY_ERROR_FIELDNAME = "error";
-	Parameter code = new Parameter(GROOVY_CODE_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-	Parameter output = new Parameter(GROOVY_OUTPUT_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_OUTPUT);
-	Parameter error = new Parameter(GROOVY_ERROR_FIELDNAME, null, null, ParameterType.STRING, null, true, Parameter.DIRECTION_OUTPUT);
+	Parameter code = new Parameter(GROOVY_CODE_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
+	Parameter output = new Parameter(GROOVY_OUTPUT_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_OUTPUT);
+	Parameter error = new Parameter(GROOVY_ERROR_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_OUTPUT);
 	private Parameter[] parms = {code, output, error};
 	
 	public GroovyParameterMap() {

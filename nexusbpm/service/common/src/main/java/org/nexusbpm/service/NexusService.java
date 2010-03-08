@@ -8,7 +8,6 @@ import org.nexusbpm.common.data.ParameterMap;
  * @author Nathan Rose
  */
 public interface NexusService {
-	public ParameterMap execute(ParameterMap data) throws NexusServiceException;
-//    public String getTransitionName();
-//    public boolean isAutoSignalling();
+	ParameterMap execute(ParameterMap data) throws NexusServiceException;
+  ParameterMap getMinimalParameterMap();
 }

@@ -201,4 +201,7 @@ public class RServiceImpl implements NexusService {
         istream.close();
         ostream.close();
     }
+  public ParameterMap getMinimalParameterMap() {
+    return new RParameterMap();
+  }
 }

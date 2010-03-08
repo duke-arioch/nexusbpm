@@ -23,8 +23,8 @@ public class RServiceTest extends NexusTestCase {
     private RParameterMap getPlotData() throws Exception {
         RParameterMap data = new RParameterMap();
         data.setServerAddress("localhost");
-        data.put(new Parameter("radius", null, null, ParameterType.INT, new Integer(1000), false, Parameter.DIRECTION_INPUT_AND_OUTPUT));
-        data.put(new Parameter("imageLocation", null, null, ParameterType.BINARY_FILE, new URI("tmp:test.png"), false, Parameter.DIRECTION_OUTPUT));
+        data.put(new Parameter("radius", ParameterType.INT, new Integer(1000), false, Parameter.DIRECTION_INPUT_AND_OUTPUT));
+        data.put(new Parameter("imageLocation", ParameterType.BINARY_FILE, new URI("tmp:test.png"), false, Parameter.DIRECTION_OUTPUT));
         data.setCode( 
             "t=seq(0,2*pi,length=10000);\n" +
             "png(filename=imageLocation, width=800, height=600, bg=\"grey\");\n" +

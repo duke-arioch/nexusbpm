@@ -1,5 +1,7 @@
 package org.nexusbpm.droolsflow.service.impl;
 
+import java.util.Map;
+import javax.annotation.Resource;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.drools.KnowledgeBase;
@@ -20,6 +22,32 @@ import org.nexusbpm.droolsflow.service.DroolsFlowExecutionService;
  */
 public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionService {
 
+  @Resource private Map<String, WorkItemHandler> handlers;
+
+  public Map<String, WorkItemHandler> getHandlers() {
+    return handlers;
+  }
+
+  public void setHandlers(Map<String, WorkItemHandler> handlers) {
+    this.handlers = handlers;
+  }
+
+
+  private void registerHandlers(WorkItemManager manager) {
+    for (Map.Entry<String, WorkItemHandler> entry : handlers.entrySet()) {
+      manager.registerWorkItemHandler(entry.getKey(), entry.getValue());
+    }
+    manager.registerWorkItemHandler("Script", new WorkItemHandler() {
+      @Override
+      public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
+        manager.completeWorkItem(workItem.getId(), null);
+      }
+      @Override
+      public void abortWorkItem(WorkItem arg0, WorkItemManager arg1) {}
+    });
+
+  }
+
   public void run(String resourceId) throws Exception {
     KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
     FileObject file = VFS.getManager().resolveFile(resourceId);
@@ -32,23 +60,8 @@ public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionServ
     StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
     //setup
     //then some kind of spring-y way of setting up these workitem handlers...
-    ksession.getWorkItemManager().registerWorkItemHandler("Email Sender",
-            new WorkItemHandler() {
-              @Override
-              public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-                manager.completeWorkItem(workItem.getId(), null);
-              }
-              @Override
-              public void abortWorkItem(WorkItem arg0, WorkItemManager arg1) {}
-            });
-    ksession.getWorkItemManager().registerWorkItemHandler("Script", new WorkItemHandler() {
-      @Override
-      public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-        manager.completeWorkItem(workItem.getId(), null);
-      }
-      @Override
-      public void abortWorkItem(WorkItem arg0, WorkItemManager arg1) {}
-    });
+    registerHandlers(ksession.getWorkItemManager());
+
 
   }
 }

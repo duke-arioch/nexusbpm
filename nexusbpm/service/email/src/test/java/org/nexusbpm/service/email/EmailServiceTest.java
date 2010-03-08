@@ -30,7 +30,7 @@ public class EmailServiceTest extends NexusTestCase {
     data.setRequestId("1-100");
     data.setSubject("test from EmailServiceTest");
     URI path = URI.create("res:testfile.xml");
-    attachment = new Parameter("myfile", "", "", ParameterType.ASCII_FILE, path, false, Parameter.DIRECTION_INPUT);
+    attachment = new Parameter("myfile", ParameterType.ASCII_FILE, path, false, Parameter.DIRECTION_INPUT);
     data.put(attachment);
     server = SimpleSmtpServer.start();
   }

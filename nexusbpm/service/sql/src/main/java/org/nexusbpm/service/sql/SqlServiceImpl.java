@@ -535,4 +535,7 @@ public class SqlServiceImpl implements NexusService {
         }
         return null;
     }
+  public ParameterMap getMinimalParameterMap() {
+    return new SqlParameterMap();
+  }
 }

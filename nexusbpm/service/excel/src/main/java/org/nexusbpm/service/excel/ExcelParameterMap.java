@@ -19,14 +19,14 @@ public class ExcelParameterMap extends ParameterLinkedHashMap {
     public static final String EXCEL_TEMPLATE_FILE_FIELDNAME = "templateFile";
     public static final String EXCEL_DATA_FILE_FIELDNAME = "dataFile";
     public static final String EXCEL_OUTPUT_FILE_FIELDNAME = "outputFile";
-    Parameter skipHeader = new Parameter(EXCEL_SKIP_HEADER_FIELDNAME, null, null, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
-    Parameter colLimit = new Parameter(EXCEL_COL_LIMIT_FIELDNAME, null, null, ParameterType.INT, 0, true, Parameter.DIRECTION_INPUT);
-    Parameter anchor = new Parameter(EXCEL_ANCHOR_FIELDNAME, null, null, ParameterType.STRING, "A1", true, Parameter.DIRECTION_INPUT);
-    Parameter rowLimit = new Parameter(EXCEL_ROW_LIMIT_FIELDNAME, null, null, ParameterType.INT, 0, true, Parameter.DIRECTION_INPUT);
-    Parameter sheetName = new Parameter(EXCEL_SHEET_NAME_FIELDNAME, null, null, ParameterType.STRING, "Sheet1", true, Parameter.DIRECTION_INPUT);
-    Parameter templateFile = new Parameter(EXCEL_TEMPLATE_FILE_FIELDNAME, null, null, ParameterType.BINARY_FILE, null, true, Parameter.DIRECTION_INPUT);
-    Parameter dataFile = new Parameter(EXCEL_DATA_FILE_FIELDNAME, null, null, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
-    Parameter outputFile = new Parameter(EXCEL_OUTPUT_FILE_FIELDNAME, null, null, ParameterType.BINARY_FILE, null, true, Parameter.DIRECTION_OUTPUT);
+    Parameter skipHeader = new Parameter(EXCEL_SKIP_HEADER_FIELDNAME, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
+    Parameter colLimit = new Parameter(EXCEL_COL_LIMIT_FIELDNAME, ParameterType.INT, 0, true, Parameter.DIRECTION_INPUT);
+    Parameter anchor = new Parameter(EXCEL_ANCHOR_FIELDNAME, ParameterType.STRING, "A1", true, Parameter.DIRECTION_INPUT);
+    Parameter rowLimit = new Parameter(EXCEL_ROW_LIMIT_FIELDNAME, ParameterType.INT, 0, true, Parameter.DIRECTION_INPUT);
+    Parameter sheetName = new Parameter(EXCEL_SHEET_NAME_FIELDNAME, ParameterType.STRING, "Sheet1", true, Parameter.DIRECTION_INPUT);
+    Parameter templateFile = new Parameter(EXCEL_TEMPLATE_FILE_FIELDNAME, ParameterType.BINARY_FILE, null, true, Parameter.DIRECTION_INPUT);
+    Parameter dataFile = new Parameter(EXCEL_DATA_FILE_FIELDNAME, ParameterType.ASCII_FILE, null, true, Parameter.DIRECTION_INPUT);
+    Parameter outputFile = new Parameter(EXCEL_OUTPUT_FILE_FIELDNAME, ParameterType.BINARY_FILE, null, true, Parameter.DIRECTION_OUTPUT);
 
     private Parameter[] parms = {skipHeader, colLimit, anchor, rowLimit, sheetName, templateFile, dataFile, outputFile};
     

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+       ">
+
+  <bean id="executionService" class="org.nexusbpm.droolsflow.service.impl.SimpleDroolsFlowExecutionService">
+    <property name="handlers">
+      <map>
+        <entry key="Email Sender" value-ref="emailService"/>
+        <entry key="Excel" value-ref="excelService"/>
+        <entry key="FTPSender" value-ref="ftpService"/>
+        <entry key="Script" value-ref="groovyService"/>
+        <entry key="RStatistics" value-ref="rService"/>
+        <entry key="Database" value-ref="sqlService"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="emailService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.email.EmailSenderServiceImpl" /></property>
+  </bean>
+  <bean id="excelService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.excel.ExcelServiceImpl" /></property>
+  </bean>
+  <bean id="ftpService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.ftp.FtpServiceImpl" /></property>
+  </bean>
+  <bean id="groovyService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.groovy.GroovyServiceImpl" /></property>
+  </bean>
+  <bean id="rService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.r.RServiceImpl" /></property>
+  </bean>
+  <bean id="sqlService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
+    <property name="service"><bean class="org.nexusbpm.service.sql.SqlServiceImpl" /></property>
+  </bean>
+</beans>

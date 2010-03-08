@@ -22,18 +22,18 @@ public class EmailSenderParameterMap extends ParameterLinkedHashMap {
     String EMAIL_SENDER_USERNAME_FIELDNAME = "username";
     String EMAIL_SENDER_PASSWORD_FIELDNAME = "password";
     String EMAIL_SENDER_HTML_FIELDNAME = "html";
-    Parameter toAddress = new Parameter(EMAIL_SENDER_TO_ADDRESS_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter ccAddress = new Parameter(EMAIL_SENDER_CC_ADDRESS_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter bccAddress = new Parameter(EMAIL_SENDER_BCC_ADDRESS_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter fromAddress = new Parameter(EMAIL_SENDER_FROM_ADDRESS_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter subject = new Parameter(EMAIL_SENDER_SUBJECT_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter body = new Parameter(EMAIL_SENDER_BODY_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter host = new Parameter(EMAIL_SENDER_HOST_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter port = new Parameter(EMAIL_SENDER_PORT_FIELDNAME, null, null, ParameterType.STRING, "25", true, Parameter.DIRECTION_INPUT);
-    Parameter useSSL = new Parameter(EMAIL_SENDER_USE_SSL_FIELDNAME, null, null, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
-    Parameter username = new Parameter(EMAIL_SENDER_USERNAME_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter password = new Parameter(EMAIL_SENDER_PASSWORD_FIELDNAME, null, null, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
-    Parameter html = new Parameter(EMAIL_SENDER_HTML_FIELDNAME, null, null, ParameterType.BOOLEAN, Boolean.TRUE, true, Parameter.DIRECTION_INPUT);
+    Parameter toAddress = new Parameter(EMAIL_SENDER_TO_ADDRESS_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter ccAddress = new Parameter(EMAIL_SENDER_CC_ADDRESS_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter bccAddress = new Parameter(EMAIL_SENDER_BCC_ADDRESS_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter fromAddress = new Parameter(EMAIL_SENDER_FROM_ADDRESS_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter subject = new Parameter(EMAIL_SENDER_SUBJECT_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter body = new Parameter(EMAIL_SENDER_BODY_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter host = new Parameter(EMAIL_SENDER_HOST_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter port = new Parameter(EMAIL_SENDER_PORT_FIELDNAME, ParameterType.STRING, "25", true, Parameter.DIRECTION_INPUT);
+    Parameter useSSL = new Parameter(EMAIL_SENDER_USE_SSL_FIELDNAME, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
+    Parameter username = new Parameter(EMAIL_SENDER_USERNAME_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter password = new Parameter(EMAIL_SENDER_PASSWORD_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_INPUT);
+    Parameter html = new Parameter(EMAIL_SENDER_HTML_FIELDNAME, ParameterType.BOOLEAN, Boolean.TRUE, true, Parameter.DIRECTION_INPUT);
     private Parameter[] parms = {toAddress, ccAddress, bccAddress, fromAddress, subject, body, host, port, useSSL, username, password, html};
     
     public EmailSenderParameterMap() {

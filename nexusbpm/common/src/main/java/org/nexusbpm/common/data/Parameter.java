@@ -13,8 +13,6 @@ public final class Parameter implements Cloneable, Serializable {
     public static final String SOURCE_INITIAL_VALUE = "initial value";
 
     private String name;
-    private String sourceNode;
-    private String sourceVariable;
     private ParameterType type = ParameterType.STRING;
     private Object value;
     private boolean required = false;
@@ -23,31 +21,15 @@ public final class Parameter implements Cloneable, Serializable {
     public Parameter() {
     }
     
-    public Parameter(String name, String sourceNode, String sourceVariable, ParameterType type, Object value, boolean required, String direction) {
+    public Parameter(String name, ParameterType type, Object value, boolean required, String direction) {
         super();
         this.name = name;
-        this.sourceVariable = sourceVariable;
-        this.sourceNode = sourceNode;
         this.type = type;
         this.value = value;
         this.required = required;
         this.direction = direction;
     }
-    
-    public String getSourceVariable() {
-        return sourceVariable;
-    }
-    public void setSourceVariable(String sourceVariable) {
-        this.sourceVariable = sourceVariable;
-    }
-    
-    public String getSourceNode() {
-        return sourceNode;
-    }
-    public void setSourceNode(String sourceNode) {
-        this.sourceNode = sourceNode;
-    }
-    
+
     public String getName() {
         return name;
     }
@@ -76,8 +58,6 @@ public final class Parameter implements Cloneable, Serializable {
     @Override
     public Object clone() {
         Parameter retval = new Parameter();
-        retval.setSourceNode(this.getSourceNode());
-        retval.setSourceVariable(this.getSourceVariable());
         retval.setName(this.getName());
         retval.setRequired(this.isRequired());
         retval.setValue(this.getValue());
@@ -97,16 +77,9 @@ public final class Parameter implements Cloneable, Serializable {
     public String toString() {
         String val = null;
         if (value != null) val = "'" + value.toString() + "'";
-        if (sourceNode != null && sourceNode.length() != 0) val = "<<<" + sourceNode + "." + value + ">>>";
-        
         return (required == true ? "required" : "optional") + " " + direction + " var " + type.getName() + " " + name + " = " + val;
     }
-    protected boolean isInitialValue() {
-    	return getSourceNode() == null 
-    	|| "".equals(getSourceNode())
-    	|| SOURCE_INITIAL_VALUE.equals(getSourceNode())
-    	;
-    }
+
     public boolean isOfType(ParameterType type) {
     	return getType().equals(type);
     }
@@ -125,19 +98,10 @@ public final class Parameter implements Cloneable, Serializable {
     public boolean isAsciiFile() {
     	return getType().equals(ParameterType.ASCII_FILE);	
     }
-    public boolean isFromProcessSource() {
-    	return SOURCE_PROCESS_FILE.equals(getSourceNode());
-    }
-    public boolean isFromDataTransfer() {
-    	return isInput() && !isFromProcessSource() && !isInitialValue();
-    }
     public boolean isInputFile() {
     	return isInput() && isFile();
     }
     public boolean isOutputFile() {
     	return isOutput() && isFile();
-    }
-    public boolean shouldReadContents(Object sourceValue) {
-    	return (isFromProcessSource() || sourceValue instanceof URI) && !isFile();
     }
 }

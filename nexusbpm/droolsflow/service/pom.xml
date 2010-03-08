@@ -12,8 +12,49 @@
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
+      <groupId>nexusbpm</groupId>
+      <artifactId>nexusbpm.common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.email</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.excel</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.ftp</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.groovy</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.r</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nexusbpm.service</groupId>
+      <artifactId>nexusbpm.service.sql</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -22,9 +63,25 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>nexusbpm</groupId>
-      <artifactId>nexusbpm.common</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring</artifactId>
+      <version>2.5.6</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

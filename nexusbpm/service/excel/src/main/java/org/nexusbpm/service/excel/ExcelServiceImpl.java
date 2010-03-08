@@ -71,4 +71,8 @@ public class ExcelServiceImpl implements NexusService {
             throw new NexusServiceException(e, exData, false);
         }
     } //run()
+
+  public ParameterMap getMinimalParameterMap() {
+    return new ExcelParameterMap();
+  }
 }

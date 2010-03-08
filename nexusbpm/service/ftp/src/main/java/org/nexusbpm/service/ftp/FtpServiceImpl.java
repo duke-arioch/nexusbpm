@@ -31,4 +31,9 @@ public class FtpServiceImpl implements NexusService {
         }
         return data;
     }
+
+  public ParameterMap getMinimalParameterMap() {
+    return new FtpParameterMap();
+  }
+
 }
