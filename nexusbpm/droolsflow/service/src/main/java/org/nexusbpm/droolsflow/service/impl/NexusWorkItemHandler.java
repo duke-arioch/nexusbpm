@@ -19,6 +19,9 @@ public class NexusWorkItemHandler implements WorkItemHandler {
   public static final Logger LOGGER = LoggerFactory.getLogger(NexusWorkItemHandler.class);
   private NexusService service;
 
+  public NexusWorkItemHandler() {
+  }
+
   @Override
   public void abortWorkItem(WorkItem wi, WorkItemManager wim) {
     wim.abortWorkItem(wi.getId());

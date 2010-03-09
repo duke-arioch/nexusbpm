@@ -1,5 +1,6 @@
 package org.nexusbpm.droolsflow.service.impl;
 
+import java.net.URI;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.apache.commons.vfs.FileObject;
@@ -14,8 +15,10 @@ import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.process.ProcessInstance;
 import org.nexusbpm.droolsflow.service.DroolsFlowExecutionService;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author Matthew Sandoz
@@ -23,6 +26,10 @@ import org.nexusbpm.droolsflow.service.DroolsFlowExecutionService;
 public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionService {
 
   @Resource private Map<String, WorkItemHandler> handlers;
+  public static Logger LOGGER = LoggerFactory.getLogger(SimpleDroolsFlowExecutionService.class);
+
+  public SimpleDroolsFlowExecutionService() {
+  }
 
   public Map<String, WorkItemHandler> getHandlers() {
     return handlers;
@@ -48,9 +55,10 @@ public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionServ
 
   }
 
-  public void run(String resourceId) throws Exception {
+  @Override
+  public long startProcess(URI processLocation, String resourceId, Map processVariables) throws Exception {
     KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-    FileObject file = VFS.getManager().resolveFile(resourceId);
+    FileObject file = VFS.getManager().resolveFile(processLocation.toString());
     kbuilder.add(ResourceFactory.newInputStreamResource(file.getContent().getInputStream()), ResourceType.DRF);
     if (kbuilder.getErrors().size() > 0) {
       throw new Exception("REALLY THIS WILL HAVE TO BE CHANGED");
@@ -58,10 +66,10 @@ public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionServ
     KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
     StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-    //setup
-    //then some kind of spring-y way of setting up these workitem handlers...
     registerHandlers(ksession.getWorkItemManager());
 
-
+    ProcessInstance instance = ksession.startProcess(resourceId, processVariables);
+    return instance.getId();
   }
+
 }
