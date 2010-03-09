@@ -29,7 +29,6 @@ public class NexusWorkItemHandler implements WorkItemHandler {
 
   @Override
   public void executeWorkItem(WorkItem workItem, WorkItemManager workItemManager) {
-    workItemManager.completeWorkItem(workItem.getId(), null);
     ParameterMap serviceParameterMap = service.getMinimalParameterMap();
     DroolsFlowParameterMap map = new DroolsFlowParameterMap(workItem, serviceParameterMap);
     try {

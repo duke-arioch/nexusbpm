@@ -44,15 +44,6 @@ public class SimpleDroolsFlowExecutionService implements DroolsFlowExecutionServ
     for (Map.Entry<String, WorkItemHandler> entry : handlers.entrySet()) {
       manager.registerWorkItemHandler(entry.getKey(), entry.getValue());
     }
-    manager.registerWorkItemHandler("Script", new WorkItemHandler() {
-      @Override
-      public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-        manager.completeWorkItem(workItem.getId(), null);
-      }
-      @Override
-      public void abortWorkItem(WorkItem arg0, WorkItemManager arg1) {}
-    });
-
   }
 
   @Override
