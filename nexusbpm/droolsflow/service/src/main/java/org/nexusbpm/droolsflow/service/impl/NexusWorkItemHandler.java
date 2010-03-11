@@ -33,6 +33,7 @@ public class NexusWorkItemHandler implements WorkItemHandler {
     DroolsFlowParameterMap map = new DroolsFlowParameterMap(workItem, serviceParameterMap);
     try {
       Map<String, Object> outmap = service.execute(map).toOutputMap().toObjectMap();
+      LOGGER.error(outmap.toString());
       workItemManager.completeWorkItem(workItem.getId(), outmap);
     } catch (NexusServiceException nexusServiceException) {
       LOGGER.error("Exception in service execution", nexusServiceException);

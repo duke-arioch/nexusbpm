@@ -28,7 +28,6 @@ public class RuleFlowTest {
   public void testAFlow() throws Exception {
     HashMap map = new HashMap<String, Object>();
     map.put("names", Arrays.asList(new String[]{"Bill", "John"}));
-    map.put("host", "localhost");
     //rewrite the flow to move the map into the process node variables. until then, they will show up empty.
     long processId = executionService.startProcess(new URI("res:rule/ruleflow.rf"), "com.sample.ruleflow", map);
     assertThat("should at least run the service and give back an id", Long.valueOf(processId), not(equalTo(Long.valueOf(0))));
