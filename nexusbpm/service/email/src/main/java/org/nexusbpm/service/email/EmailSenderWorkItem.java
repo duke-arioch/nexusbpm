@@ -10,18 +10,18 @@ import org.nexusbpm.common.data.ParameterType;
 public class EmailSenderWorkItem extends NexusWorkItemImpl {
 
   private static final long serialVersionUID = 1L;
-  String EMAIL_SENDER_TO_ADDRESS_FIELDNAME = "toAddress";
-  String EMAIL_SENDER_CC_ADDRESS_FIELDNAME = "ccAddress";
-  String EMAIL_SENDER_BCC_ADDRESS_FIELDNAME = "bccAddress";
-  String EMAIL_SENDER_FROM_ADDRESS_FIELDNAME = "fromAddress";
-  String EMAIL_SENDER_SUBJECT_FIELDNAME = "subject";
-  String EMAIL_SENDER_BODY_FIELDNAME = "body";
-  String EMAIL_SENDER_HOST_FIELDNAME = "host";
-  String EMAIL_SENDER_PORT_FIELDNAME = "port";
-  String EMAIL_SENDER_USE_SSL_FIELDNAME = "useSSL";
-  String EMAIL_SENDER_USERNAME_FIELDNAME = "username";
-  String EMAIL_SENDER_PASSWORD_FIELDNAME = "password";
-  String EMAIL_SENDER_HTML_FIELDNAME = "html";
+  public static final String EMAIL_SENDER_TO_ADDRESS_FIELDNAME = "toAddress";
+  public static final String EMAIL_SENDER_CC_ADDRESS_FIELDNAME = "ccAddress";
+  public static final String EMAIL_SENDER_BCC_ADDRESS_FIELDNAME = "bccAddress";
+  public static final String EMAIL_SENDER_FROM_ADDRESS_FIELDNAME = "fromAddress";
+  public static final String EMAIL_SENDER_SUBJECT_FIELDNAME = "subject";
+  public static final String EMAIL_SENDER_BODY_FIELDNAME = "body";
+  public static final String EMAIL_SENDER_HOST_FIELDNAME = "host";
+  public static final String EMAIL_SENDER_PORT_FIELDNAME = "port";
+  public static final String EMAIL_SENDER_USE_SSL_FIELDNAME = "useSSL";
+  public static final String EMAIL_SENDER_USERNAME_FIELDNAME = "username";
+  public static final String EMAIL_SENDER_PASSWORD_FIELDNAME = "password";
+  public static final String EMAIL_SENDER_HTML_FIELDNAME = "html";
 
   public EmailSenderWorkItem() {
     super();

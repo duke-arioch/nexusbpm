@@ -10,7 +10,7 @@ import org.nexusbpm.common.data.ParameterType;
 public class GroovyWorkItem extends NexusWorkItemImpl {
 
 	private static final long serialVersionUID = 1L;
-	String GROOVY_CODE_FIELDNAME = "code";
+	public static final String GROOVY_CODE_FIELDNAME = "code";
 	
 	public GroovyWorkItem() {
 		super();

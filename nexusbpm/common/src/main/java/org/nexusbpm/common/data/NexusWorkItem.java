@@ -39,4 +39,5 @@ public interface NexusWorkItem {
   void setOut(String out);
 
   void setReturnCode(String returnCode);
+
 }
