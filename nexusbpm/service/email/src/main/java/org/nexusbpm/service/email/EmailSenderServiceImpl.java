@@ -22,7 +22,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.nexusbpm.common.data.Parameter;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
@@ -37,6 +36,7 @@ public class EmailSenderServiceImpl implements NexusService {
   private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailSenderServiceImpl.class);
 
+  @Override
   public void execute(NexusWorkItem workItem) throws NexusServiceException {
     EmailSenderWorkItem eData = (EmailSenderWorkItem) workItem;
     String to = null;

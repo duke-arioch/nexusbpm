@@ -72,7 +72,8 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
   }
 
   public String getPort() {
-    return (String) this.getParameters().get(EMAIL_SENDER_PORT_FIELDNAME);
+    String retval = (String) this.getParameters().get(EMAIL_SENDER_PORT_FIELDNAME);
+    return retval == null ? "25" : retval;
   }
 
   public void setPort(String port) {
@@ -120,7 +121,8 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
   }
 
   public Boolean getHTML() {
-    return (Boolean) this.getParameters().get(EMAIL_SENDER_HTML_FIELDNAME);
+    Boolean retval = (Boolean) this.getParameters().get(EMAIL_SENDER_HTML_FIELDNAME);
+    return retval == null ? Boolean.TRUE : retval;
   }
 
   public void setHTML(Boolean html) {
