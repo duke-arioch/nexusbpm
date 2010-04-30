@@ -23,11 +23,11 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterMap;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.nexusbpm.common.data.NexusWorkItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,8 @@ public class EmailSenderServiceImpl implements NexusService {
   private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailSenderServiceImpl.class);
 
-  public ParameterMap execute(ParameterMap data) throws NexusServiceException {
+  public void execute(NexusWorkItem workItem) throws NexusServiceException {
+    EmailSenderWorkItem eData = (EmailSenderWorkItem) workItem;
     String to = null;
     String cc = null;
     String bcc = null;
@@ -51,7 +52,6 @@ public class EmailSenderServiceImpl implements NexusService {
     boolean useSSL = false;
     boolean html = false;
     StringBuffer b = new StringBuffer();
-    EmailSenderParameterMap eData = new EmailSenderParameterMap(data);
     try {
       to = eData.getToAddress();
       cc = eData.getCcAddress();
@@ -73,10 +73,8 @@ public class EmailSenderServiceImpl implements NexusService {
       send(to, cc, bcc, from, username, password, subject, body, host, port, useSSL, html, eData);
     } catch (Exception e) {
       LOGGER.error("Error sending email!\n" + b.toString(), e);
-      throw new NexusServiceException("Error sending email!", e, eData, false);
+      throw new NexusServiceException("Error sending email!", e);
     }
-
-    return eData;
   }
 
   //Get a session and send the email
@@ -84,7 +82,7 @@ public class EmailSenderServiceImpl implements NexusService {
           String user, String password,
           String subject, String body, String host, String port, boolean isSecure,
           boolean html,
-          EmailSenderParameterMap data)
+          EmailSenderWorkItem data)
           throws AddressException, MessagingException, IOException {
     Message message = null;
     Session session = getSession(host, port, isSecure, user, password, from);
@@ -145,18 +143,12 @@ public class EmailSenderServiceImpl implements NexusService {
     return session;
   }
 
-  private void attachFiles(Multipart mp, EmailSenderParameterMap data) throws IOException, MessagingException {
-    for (Parameter param : data.values()) {
-      Object value = param.getValue();
-      if (!param.isRequired()
-              && !param.getDirection().equals("out")
-              && param.isFile()
-              && value != null
-              && value instanceof URI
-              && value.toString().length() > 0) {
+  private void attachFiles(Multipart mp, EmailSenderWorkItem data) throws IOException, MessagingException {
+    for (Object value : data.getParameters().values()) {
+      if (value instanceof URI) {
         FileObject file = VFS.getManager().resolveFile(((URI) value).toString());
 
-        FileObjectDataSource source = new FileObjectDataSource(file, param.isAsciiFile());
+        FileObjectDataSource source = new FileObjectDataSource(file, false);
 
         MimeBodyPart part = new MimeBodyPart();
 
@@ -168,8 +160,9 @@ public class EmailSenderServiceImpl implements NexusService {
     }
   }
 
-  public ParameterMap getMinimalParameterMap() {
-    return new EmailSenderParameterMap();
+  @Override
+  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem workItem) {
+    return new EmailSenderWorkItem(workItem);
   }
 
   private class PasswordAuthenticator extends Authenticator {

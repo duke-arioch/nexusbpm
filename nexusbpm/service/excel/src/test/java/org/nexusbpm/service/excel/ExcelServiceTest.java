@@ -1,7 +1,7 @@
 package org.nexusbpm.service.excel;
 
 import org.nexusbpm.service.excel.ExcelServiceImpl;
-import org.nexusbpm.service.excel.ExcelParameterMap;
+import org.nexusbpm.service.excel.ExcelWorkItem;
 import java.net.URI;
 
 import org.nexusbpm.common.NexusTestCase;
@@ -23,16 +23,9 @@ public class ExcelServiceTest extends NexusTestCase {
     @Test
     public void testSpreadsheet() throws NexusServiceException, FileSystemException {
         ExcelServiceImpl service = new ExcelServiceImpl();
-        ExcelParameterMap data = new ExcelParameterMap();
+        ExcelWorkItem data = new ExcelWorkItem();
         FileSystemManager manager = VFS.getManager();
-//        java.net.URL resource = getClass().getClassLoader().getResource("test.csv");
-//        System.out.println(">>>>" + resource );
         FileObject file = manager.resolveFile("res:test.csv");
-        System.out.println(">>>>" + file.getName().getFriendlyURI());
-        System.out.println(">>>>" + file.getContent().getSize());
-
-
-
         FileObject template = manager.resolveFile("res:test.xls");
         FileObject csv = manager.resolveFile("res:test.csv");
         FileObject outfile = manager.resolveFile("tmp:test.out.xls");
@@ -40,9 +33,8 @@ public class ExcelServiceTest extends NexusTestCase {
         data.setAnchor("A16");
         data.setColLimit(Integer.valueOf(15));
         data.setRowLimit(Integer.valueOf(15));
-        data.setProcessName("test");
-        data.setRequestId("1-2-3");
-        data.setProcessVersion("1");
+        data.setName("test");
+        data.setWorkItemId("1-2-3");
         data.setTemplateFile(template);
         data.setSkipHeader(Boolean.FALSE);
         data.setDataFile(csv);

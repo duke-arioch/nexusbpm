@@ -17,13 +17,13 @@ import org.rosuda.REngine.Rserve.RserveException;
 import org.rosuda.REngine.Rserve.RConnection;
 
 import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterMap;
 import org.nexusbpm.common.data.ObjectConverter;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileUtil;
 import org.apache.commons.vfs.VFS;
+import org.nexusbpm.common.data.NexusWorkItem;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -32,14 +32,14 @@ public class RServiceImpl implements NexusService {
 
     public static final Logger logger = LoggerFactory.getLogger(RServiceImpl.class);
 
-    public ParameterMap execute(ParameterMap data) throws NexusServiceException {
+    public void execute(NexusWorkItem data) throws NexusServiceException {
         StringBuilder result = new StringBuilder("R service call results:\n");
-        RParameterMap rData = new RParameterMap(data);
+        RWorkItem rData = (RWorkItem) data;
         RSession session = null;
         RConnection c = null;
         Exception ex = null;
         try {
-            rData.setOutput("");
+            rData.setOut("");
             result.append("Session Attachment: \n");
             byte[] sessionBytes = rData.getSession();
             if(sessionBytes != null && sessionBytes.length > 0) {
@@ -58,8 +58,21 @@ public class RServiceImpl implements NexusService {
                 c = new RConnection(rData.getServerAddress());
             // assign any necessary data from incoming attributes
             result.append("Input Parameters: \n");
-            for(String attributeName : rData.keySet()) {
-                Parameter parameter = rData.get(attributeName);
+
+            for(String attributeName : rData.getParameters().keySet()) {
+                Object parameter = rData.getParameters().get(attributeName);
+
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+//this requires more thought than i can now muster                
+/*
+
                 if(!parameter.isRequired()) {
                     if(parameter.isFile()) {
                         if(parameter.isInput()) {
@@ -89,17 +102,27 @@ public class RServiceImpl implements NexusService {
                         }
                     }
                 }
+
+        */
+
             }
             REXP x = c.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
             result.append("Execution results:\n" + x.asString() + "\n");
             if(x.isNull() || x.asString().startsWith("Error")) {
                 // only error has an attribute (the class)
-                rData.setError(x.asString());
+                rData.setErr(x.asString());
                 // what should we do after an error?
                 throw new NexusServiceException("R error: " + x.asString());
             }
             result.append("Output Parameters:\n");
             // process dynamic attributes: (storing attributes)
+
+//this requires more thought than i can now muster
+//this requires more thought than i can now muster
+//this requires more thought than i can now muster
+//this requires more thought than i can now muster
+//this requires more thought than i can now muster
+            /*
             for(String attributeName : rData.keySet()) {
                 Parameter parameter = rData.get(attributeName);
                 if(!parameter.isOutput() ||
@@ -128,16 +151,17 @@ public class RServiceImpl implements NexusService {
                     result.append("Missing Output Variable " + attributeName + "\n");
                 }
             }
+            */
         } catch(REXPMismatchException rme) {
-            rData.setError(rme.getMessage());
+            rData.setErr(rme.getMessage());
             ex = rme;
         } catch(RserveException re) {
-            rData.setError(re.getRequestErrorDescription());
+            rData.setErr(re.getRequestErrorDescription());
             ex = re;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            rData.setError(sw.toString());
+            rData.setErr(sw.toString());
             // e.printStackTrace();
             ex = e;
         } finally {
@@ -165,13 +189,13 @@ public class RServiceImpl implements NexusService {
                     } catch(IOException e) {
                         StringWriter sw = new StringWriter();
                         PrintWriter pw = new PrintWriter(sw);
-                        if(rData.getError() != null && rData.getError().length() > 0) {
-                            pw.println(rData.getError());
+                        if(rData.getErr() != null && rData.getErr().length() > 0) {
+                            pw.println(rData.getErr());
                             pw.println();
                         }
                         pw.println("Error detaching session!");
                         e.printStackTrace(pw);
-                        rData.setError(sw.toString());
+                        rData.setErr(sw.toString());
                         result.append("  Error detaching session!\n");
                         close = true;
                     }
@@ -183,12 +207,20 @@ public class RServiceImpl implements NexusService {
                 }
             }
         }
-        rData.setOutput(result.toString());
+        rData.setOut(result.toString());
         if (ex != null) {
             logger.error("R service error", ex);
-            throw new NexusServiceException("R service error", ex, rData);
+            throw new NexusServiceException("R service error", ex);
         }
-        return rData;
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
+//this will require more careful thought than i can now muster.
     }// run()
 
     protected void copyStream(InputStream istream, OutputStream ostream)
@@ -201,7 +233,9 @@ public class RServiceImpl implements NexusService {
         istream.close();
         ostream.close();
     }
-  public ParameterMap getMinimalParameterMap() {
-    return new RParameterMap();
+  
+  @Override  
+  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
+    return new RWorkItem(item);
   }
 }

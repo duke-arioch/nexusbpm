@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 public class EmailServiceTest extends NexusTestCase {
 
   private Parameter attachment;
-  protected EmailSenderParameterMap data = new EmailSenderParameterMap();
+  protected EmailSenderWorkItem data = new EmailSenderWorkItem();
   SimpleSmtpServer server;
 
   @Before
@@ -26,12 +26,12 @@ public class EmailServiceTest extends NexusTestCase {
     data.setBody("Body for <i>Email</i>ServiceTest");
     data.setCcAddress("");
     data.setHTML(Boolean.TRUE);
-    data.setProcessName("test");
-    data.setRequestId("1-100");
+    data.setName("test");
+    data.setWorkItemId("1-100");
     data.setSubject("test from EmailServiceTest");
     URI path = URI.create("res:testfile.xml");
     attachment = new Parameter("myfile", ParameterType.ASCII_FILE, path, false, Parameter.DIRECTION_INPUT);
-    data.put(attachment);
+    data.getParameters().put("attachment1", attachment);
     server = SimpleSmtpServer.start();
   }
 
@@ -59,7 +59,7 @@ public class EmailServiceTest extends NexusTestCase {
     data.setPassword("!!!");
     data.setSecure(Boolean.TRUE);
     data.setToAddress("!!!");
-    data.put(attachment);
+    data.getParameters().put("attachment", attachment);
     EmailSenderServiceImpl service = new EmailSenderServiceImpl();
     service.execute(data);
   }
@@ -72,7 +72,7 @@ public class EmailServiceTest extends NexusTestCase {
     data.setPassword("!!!");
     data.setSecure(Boolean.FALSE);
     data.setFromAddress("!!!");
-    data.put(attachment);
+    data.getParameters().put("attachment", attachment);
     EmailSenderServiceImpl service = new EmailSenderServiceImpl();
     service.execute(data);
   }

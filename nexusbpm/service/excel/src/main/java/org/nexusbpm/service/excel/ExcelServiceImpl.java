@@ -1,9 +1,9 @@
 package org.nexusbpm.service.excel;
 
-import org.nexusbpm.common.data.ParameterMap;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
+import org.nexusbpm.common.data.NexusWorkItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +21,9 @@ public class ExcelServiceImpl implements NexusService {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger( ExcelServiceImpl.class );
     
-    public ParameterMap execute(ParameterMap data) throws NexusServiceException {
-        ExcelParameterMap exData = new ExcelParameterMap(data);
+    @Override
+    public void execute(NexusWorkItem data) throws NexusServiceException {
+        ExcelWorkItem exData = (ExcelWorkItem) data;
         
         FileObject template = exData.getTemplateFile();
         FileObject inputData = exData.getDataFile();
@@ -65,14 +66,13 @@ public class ExcelServiceImpl implements NexusService {
             excelObject.save();
             logger.debug("Finished adding " + rows + " rows into spreadsheet");
             
-            return exData;
         }
         catch(Exception e) {
-            throw new NexusServiceException(e, exData, false);
+            throw new NexusServiceException("Exception in Excel service", e);
         }
     } //run()
 
-  public ParameterMap getMinimalParameterMap() {
-    return new ExcelParameterMap();
+  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem workItem) {
+    return new ExcelWorkItem(workItem);
   }
 }

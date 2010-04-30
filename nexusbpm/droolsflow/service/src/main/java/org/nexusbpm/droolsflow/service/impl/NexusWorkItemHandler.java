@@ -7,12 +7,13 @@ package org.nexusbpm.droolsflow.service.impl;
 import org.drools.runtime.process.WorkItem;
 import org.drools.runtime.process.WorkItemHandler;
 import org.drools.runtime.process.WorkItemManager;
-import org.nexusbpm.common.data.ParameterMap;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Map;
+import org.nexusbpm.common.data.NexusWorkItem;
+import org.nexusbpm.common.data.NexusWorkItemImpl;
 
 public class NexusWorkItemHandler implements WorkItemHandler {
 
@@ -29,12 +30,17 @@ public class NexusWorkItemHandler implements WorkItemHandler {
 
   @Override
   public void executeWorkItem(WorkItem workItem, WorkItemManager workItemManager) {
-    ParameterMap serviceParameterMap = service.getMinimalParameterMap();
-    DroolsFlowParameterMap map = new DroolsFlowParameterMap(workItem, serviceParameterMap);
+    NexusWorkItem nexusWorkItem = new NexusWorkItemImpl();
+    nexusWorkItem.setName(workItem.getName());
+    nexusWorkItem.setParameters(workItem.getParameters());
+    nexusWorkItem.setProcessInstanceId(String.valueOf(workItem.getProcessInstanceId()));
+    nexusWorkItem.setWorkItemId(String.valueOf(workItem.getId()));
+
+    NexusWorkItem specificNexusWorkItem = service.createCompatibleWorkItem(nexusWorkItem);
     try {
-      Map<String, Object> outmap = service.execute(map).toOutputMap().toObjectMap();
-      LOGGER.error(outmap.toString());
-      workItemManager.completeWorkItem(workItem.getId(), outmap);
+      service.execute(specificNexusWorkItem);
+      LOGGER.error(specificNexusWorkItem.getErr());
+      workItemManager.completeWorkItem(workItem.getId(), specificNexusWorkItem.getResults());
     } catch (NexusServiceException nexusServiceException) {
       LOGGER.error("Exception in service execution", nexusServiceException);
     }

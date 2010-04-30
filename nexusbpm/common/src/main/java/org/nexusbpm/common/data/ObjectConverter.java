@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-import org.nexusbpm.common.util.ObjectConversionException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;

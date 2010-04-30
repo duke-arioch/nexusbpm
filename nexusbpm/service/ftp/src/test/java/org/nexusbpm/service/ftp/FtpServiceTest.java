@@ -1,7 +1,7 @@
 package org.nexusbpm.service.ftp;
 
 import org.nexusbpm.service.ftp.FtpServiceImpl;
-import org.nexusbpm.service.ftp.FtpParameterMap;
+import org.nexusbpm.service.ftp.FtpWorkItem;
 import java.net.URI;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
@@ -46,15 +46,15 @@ public class FtpServiceTest {
     @Test
     public void testRoundtrip() throws Exception {
         FtpServiceImpl service = new FtpServiceImpl();
-        FtpParameterMap data = new FtpParameterMap();
+        FtpWorkItem data = new FtpWorkItem();
         data.setInput(new URI("res:testfile.xml"));
         data.setOutput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
-        FtpParameterMap outData = (FtpParameterMap) service.execute(data);
+        service.execute(data);
 
         data.setInput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
         data.setOutput(new URI("tmp://testfile.out.xml"));
-        outData = (FtpParameterMap) service.execute(data);
+        service.execute(data);
 
-        System.out.println(outData);
+        System.out.println(data);
     }
 }
