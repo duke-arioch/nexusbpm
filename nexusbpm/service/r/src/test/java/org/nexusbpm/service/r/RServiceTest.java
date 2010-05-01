@@ -1,21 +1,19 @@
 package org.nexusbpm.service.r;
 
-import org.nexusbpm.service.r.RServiceImpl;
-import org.nexusbpm.service.r.RWorkItem;
-import java.io.IOException;
 
 import org.nexusbpm.common.NexusTestCase;
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterType;
 import org.nexusbpm.service.NexusServiceException;
 import java.net.URI;
+import java.net.URL;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import junit.framework.Assert;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
+
 public class RServiceTest extends NexusTestCase {
     private String unique = "output-" + System.currentTimeMillis();
     
@@ -44,13 +42,12 @@ public class RServiceTest extends NexusTestCase {
         System.out.println(data.getCode());
         System.out.println(data.getOut());
         System.out.println(data.getErr());
-        
-        if (!"".equals(data.getErr())) {
-            Assert.fail("R command did not complete properly.");
+
+        if (data.getErr() != null) {
+            Assert.fail("R command did not complete properly due to " + data.getErr());
         }
         else {
-//            System.out.println(data.get("imageLocation").getValue());
-//            Icon icon = (Icon) new ImageIcon(new URL(data.get("imageLocation").getValue().toString()));
+            System.out.println(data.getResults().get("imageLocation"));
 //            JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
         }
         Assert.assertEquals(1001, data.getResults().get("radius"));
@@ -58,7 +55,7 @@ public class RServiceTest extends NexusTestCase {
         FileObject file = VFS.getManager().resolveFile(uri);
         Assert.assertEquals(9585, file.getContent().getSize());
     }
-    
+
     @Test
     public void testRSyntaxExceptionHandling() throws Exception {
         RServiceImpl r = new RServiceImpl();

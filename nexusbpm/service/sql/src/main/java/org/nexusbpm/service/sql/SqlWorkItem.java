@@ -1,8 +1,10 @@
 package org.nexusbpm.service.sql;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import org.nexusbpm.common.data.NexusWorkItemImpl;
 import org.nexusbpm.common.data.NexusWorkItem;
 
@@ -25,6 +27,21 @@ public class SqlWorkItem extends NexusWorkItemImpl {
   public static final String SQL_CSV_INPUT_KEY = "csvInputUri";
   public static final String SQL_CSV_OUTPUT_KEY = "csvOutputUri";
   public static final String SQL_RECORD_COUNT_KEY = "recordCount";
+  public static final List<String> fields = Arrays.asList(
+          SQL_JDBC_DRIVER_CLASS_NAME_KEY,
+          SQL_JDBC_URI_KEY,
+          SQL_USER_NAME_KEY,
+          SQL_PASSWORD_KEY,
+          SQL_SQL_CODE_KEY,
+          SQL_STATEMENT_TYPE_KEY,
+          SQL_DATA_MAPPINGS,
+          SQL_TABLE_NAME,
+          SQL_CSV_INPUT_KEY,
+          SQL_CSV_OUTPUT_KEY,
+          SQL_RECORD_COUNT_KEY,
+          WORKITEM_OUT_KEY,
+          WORKITEM_ERR_KEY,
+          WORKITEM_RETURN_CODE_KEY);
 
   public SqlWorkItem() {
     super();
@@ -32,6 +49,11 @@ public class SqlWorkItem extends NexusWorkItemImpl {
 
   public SqlWorkItem(NexusWorkItem item) {
     super(item);
+  }
+
+  @Override
+  public List<String> getRequiredParameterNames() {
+    return super.getRequiredParameterNames();
   }
 
   public String getJdbcDriverClassName() {

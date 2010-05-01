@@ -1,9 +1,16 @@
 package org.nexusbpm.common.data;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NexusWorkItemImpl implements NexusWorkItem {
+
+  public static final String WORKITEM_RETURN_CODE_KEY = "returnCode";
+  public static final String WORKITEM_OUT_KEY = "out";
+  public static final String WORKITEM_ERR_KEY = "err";
 
   private static final long serialVersionUID = 1l;
   private String name;
@@ -11,6 +18,8 @@ public class NexusWorkItemImpl implements NexusWorkItem {
   private String processInstanceId;
   private Map<String, Object> parameters;
   private Map<String, Object> results;
+
+  public static final List<String> fields = Arrays.asList(WORKITEM_RETURN_CODE_KEY, WORKITEM_OUT_KEY, WORKITEM_ERR_KEY);
 
   public NexusWorkItemImpl(NexusWorkItem item) {
     super();
@@ -25,6 +34,11 @@ public class NexusWorkItemImpl implements NexusWorkItem {
     super();
     this.setParameters(new LinkedHashMap<String, Object>());
     this.setResults(new LinkedHashMap<String, Object>());
+  }
+
+  @Override
+  public List<String> getRequiredParameterNames() {
+    return fields;
   }
 
   @Override

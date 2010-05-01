@@ -1,11 +1,9 @@
 package org.nexusbpm.service.email;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 import org.nexusbpm.common.data.NexusWorkItem;
 import org.nexusbpm.common.data.NexusWorkItemImpl;
-
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterType;
 
 public class EmailSenderWorkItem extends NexusWorkItemImpl {
 
@@ -22,6 +20,22 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
   public static final String EMAIL_SENDER_USERNAME_FIELDNAME = "username";
   public static final String EMAIL_SENDER_PASSWORD_FIELDNAME = "password";
   public static final String EMAIL_SENDER_HTML_FIELDNAME = "html";
+  public static final List<String> fields = Arrays.asList(
+          EMAIL_SENDER_TO_ADDRESS_FIELDNAME,
+          EMAIL_SENDER_CC_ADDRESS_FIELDNAME,
+          EMAIL_SENDER_BCC_ADDRESS_FIELDNAME,
+          EMAIL_SENDER_FROM_ADDRESS_FIELDNAME,
+          EMAIL_SENDER_SUBJECT_FIELDNAME,
+          EMAIL_SENDER_BODY_FIELDNAME,
+          EMAIL_SENDER_HOST_FIELDNAME,
+          EMAIL_SENDER_PORT_FIELDNAME,
+          EMAIL_SENDER_USE_SSL_FIELDNAME,
+          EMAIL_SENDER_USERNAME_FIELDNAME,
+          EMAIL_SENDER_PASSWORD_FIELDNAME,
+          EMAIL_SENDER_HTML_FIELDNAME,
+          WORKITEM_OUT_KEY,
+          WORKITEM_ERR_KEY,
+          WORKITEM_RETURN_CODE_KEY);
 
   public EmailSenderWorkItem() {
     super();
@@ -29,6 +43,11 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
 
   public EmailSenderWorkItem(NexusWorkItem item) {
     super(item);
+  }
+
+  @Override
+  public List<String> getRequiredParameterNames() {
+    return fields;
   }
 
   public String getBccAddress() {

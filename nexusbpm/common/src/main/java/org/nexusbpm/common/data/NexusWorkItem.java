@@ -1,5 +1,6 @@
 package org.nexusbpm.common.data;
 
+import java.util.List;
 import java.util.Map;
 
 public interface NexusWorkItem {
@@ -39,5 +40,7 @@ public interface NexusWorkItem {
   void setOut(String out);
 
   void setReturnCode(String returnCode);
+
+  List<String> getRequiredParameterNames();
 
 }
