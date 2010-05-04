@@ -15,21 +15,16 @@ public class RWorkItem extends NexusWorkItemImpl {
   static String R_KEEP_SESSION_FIELDNAME = "keepSession";
   static String R_SERVER_ADDRESS_FIELDNAME = "serverAddress";
   static String R_SESSION_FIELDNAME = "session";
-  public static final List<String> fields = Arrays.asList(
+  public static final List<String> R_INPUT_FIELDS = Arrays.asList(
           R_CODE_FIELDNAME,
           R_KEEP_SESSION_FIELDNAME,
           R_SERVER_ADDRESS_FIELDNAME,
+          R_SESSION_FIELDNAME);
+  public static final List<String> R_OUTPUT_FIELDS = Arrays.asList(
           R_SESSION_FIELDNAME,
           WORKITEM_OUT_KEY,
           WORKITEM_ERR_KEY,
           WORKITEM_RETURN_CODE_KEY);
-//  Parameter code = new Parameter(R_CODE_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-//	Parameter output = new Parameter(R_OUTPUT_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
-//	Parameter error = new Parameter(R_ERROR_FIELDNAME, ParameterType.STRING, "", true, Parameter.DIRECTION_OUTPUT);
-//  Parameter keepSession = new Parameter(R_KEEP_SESSION_FIELDNAME, ParameterType.BOOLEAN, Boolean.FALSE, true, Parameter.DIRECTION_INPUT);
-//  Parameter serverAddress = new Parameter(R_SERVER_ADDRESS_FIELDNAME, ParameterType.STRING, null, true, Parameter.DIRECTION_INPUT);
-//  Parameter session = new Parameter(R_SESSION_FIELDNAME, ParameterType.BINARY, null, true, Parameter.DIRECTION_INPUT_AND_OUTPUT);
-//	private Parameter[] parms = {code, output, error, keepSession, serverAddress, session};
 
   public RWorkItem() {
     super();
@@ -37,6 +32,26 @@ public class RWorkItem extends NexusWorkItemImpl {
 
   public RWorkItem(NexusWorkItem item) {
     super(item);
+  }
+
+  @Override
+  public List<String> getRequiredInputParameterNames() {
+    return R_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return R_OUTPUT_FIELDS;
+  }
+
+  @Override
+  public boolean isRequiredParameter(String name) {
+    return R_INPUT_FIELDS.contains(name);
+  }
+
+  @Override
+  public boolean isRequiredResult(String name) {
+    return R_OUTPUT_FIELDS.contains(name);
   }
 
   public String getCode() {
@@ -70,4 +85,5 @@ public class RWorkItem extends NexusWorkItemImpl {
   public void setKeepSession(Boolean keepSession) {
     getParameters().put(R_KEEP_SESSION_FIELDNAME, keepSession);
   }
+
 }

@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import org.apache.commons.io.IOUtils;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RSession;
@@ -25,6 +26,7 @@ import org.apache.commons.vfs.FileUtil;
 import org.apache.commons.vfs.VFS;
 import org.nexusbpm.common.data.NexusWorkItem;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngine;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -40,7 +42,7 @@ public class RServiceImpl implements NexusService {
     RConnection c = null;
     Exception ex = null;
     try {
-      rData.setOut("");
+      data.setOut("");
       result.append("Session Attachment: \n");
       byte[] sessionBytes = rData.getSession();
       if (sessionBytes != null && sessionBytes.length > 0) {
@@ -65,95 +67,40 @@ public class RServiceImpl implements NexusService {
         Object parameter = rData.getParameters().get(attributeName);
 
 //this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-//this requires more thought than i can now muster                
-/*
 
-        if(!parameter.isRequired()) {
-        if(parameter.isFile()) {
-        if(parameter.isInput()) {
-        FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
-        OutputStream ostream = c.createFile(file.getName().getBaseName());
-        FileUtil.writeContent(file, ostream);
-        result.append("  " + parameter.getType().getName() + " " + attributeName + "="
-        + parameter.getValue() + " mapped to " + file.getName().getBaseName() + "\n");
-        c.assign(attributeName, file.getName().getBaseName());
-        } else {
-        FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
-        c.assign(attributeName, file.getName().getBaseName());
+        if (!rData.isRequiredParameter(attributeName)) {
+          if (parameter instanceof URI) {
+            FileObject file = VFS.getManager().resolveFile(((URI) parameter).toString());
+            c.assign(attributeName, file.getName().getBaseName());
+          } else {
+            c.assign(attributeName, RUtils.convertToREXP(parameter));
+          }
+          result.append("  " + parameter.getClass().getSimpleName() + " " + attributeName + "=" + parameter + "\n");
         }
-        } else if(parameter.isInput()) {
-        result.append("  " + parameter.getType().getName() + " " + attributeName + "=" + parameter.getValue() + "\n");
-        Object val = parameter.getValue();
-        if(val instanceof Integer) {
-        int i[] = { ((Integer) val).intValue() };
-        c.assign(attributeName, i);
-        } else if(val instanceof Number) {
-        double d[] = { ((Number) val).doubleValue() };
-        c.assign(attributeName, d);
-        } else if(val != null) {
-        c.assign(attributeName, val.toString());
-        } else {
-        c.assign(attributeName, (String) "");
-        }
-        }
-        }
-
-         */
-
       }
       REXP x = c.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
       result.append("Execution results:\n" + x.asString() + "\n");
       if (x.isNull() || x.asString().startsWith("Error")) {
         // only error has an attribute (the class)
-        rData.setErr(x.asString());
+        data.setErr(x.asString());
         // what should we do after an error?
         throw new NexusServiceException("R error: " + x.asString());
       }
       result.append("Output Parameters:\n");
       // process dynamic attributes: (storing attributes)
 
-//this requires more thought than i can now muster
-//this requires more thought than i can now muster
-//this requires more thought than i can now muster
-//this requires more thought than i can now muster
-//this requires more thought than i can now muster
-            /*
-      for(String attributeName : rData.keySet()) {
-      Parameter parameter = rData.get(attributeName);
-      if(!parameter.isOutput() ||
-      attributeName.equals("code") || attributeName.equals("output") ||
-      attributeName.equals("error") || attributeName.equals("session"))
-      continue;
-      String ac = c.eval("if (exists(\"" + attributeName + "\")) class(" + attributeName + ")[1] else '..'")
-      .asString();
-      if(!(ac == null || ac.equals(".."))) {
-      REXP var = c.eval(attributeName);
-      Object o = RUtils.convertREXP(var, parameter.getType().getJavaClass());
-      if(parameter.isFile()) {
-      // outputting to a file
-      InputStream istream = c.openFile(var.asString());
-      FileObject file = VFS.getManager().resolveFile(((URI) parameter.getValue()).toString());
-      OutputStream ostream = file.getContent().getOutputStream();
-      copyStream(istream, ostream);
-      rData.get(attributeName).setValue(((URI) parameter.getValue()).toString());
-      result.append("  " + attributeName + "=" + rData.get(attributeName).getValue() + "\n");
-      } else {
-      rData.get(attributeName).setValue(
-      ObjectConverter.convert(o, parameter.getType().getJavaClass()));
-      result.append("  " + attributeName + "=" + parameter.getValue() + "\n");
+      REXP vars = c.eval("ls();");
+      String[] rVariables = vars.asStrings();
+      REXP f = c.eval("retval");
+
+      for (String varname : rVariables) {
+        //evaluate 'retval' and you'll get file info -
+        //"myfile = file("boxplot.png");retval=showConnections(TRUE)[myfile,];";
+
+        Object varvalue = RUtils.convertREXP(c.eval(varname));
+        data.getResults().put(varname, varvalue);
+        result.append("  " + varname + "=" + varvalue + "\n");
       }
-      } else {
-      result.append("Missing Output Variable " + attributeName + "\n");
-      }
-      }
-       */
     } catch (REXPMismatchException rme) {
       rData.setErr(rme.getMessage());
       ex = rme;
@@ -209,32 +156,13 @@ public class RServiceImpl implements NexusService {
         }
       }
     }
-    rData.setOut(result.toString());
+    data.setOut(result.toString());
     if (ex != null) {
       logger.error("R service error", ex);
       throw new NexusServiceException("R service error", ex);
     }
 //this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
-//this will require more careful thought than i can now muster.
   }// run()
-
-  protected void copyStream(InputStream istream, OutputStream ostream)
-          throws IOException {
-    byte[] b = new byte[65536];
-    int numread = 0;
-    while ((numread = istream.read(b, 0, 65535)) > 0) {
-      ostream.write(b, 0, numread);
-    }
-    istream.close();
-    ostream.close();
-  }
 
   @Override
   public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {

@@ -27,7 +27,7 @@ public class SqlWorkItem extends NexusWorkItemImpl {
   public static final String SQL_CSV_INPUT_KEY = "csvInputUri";
   public static final String SQL_CSV_OUTPUT_KEY = "csvOutputUri";
   public static final String SQL_RECORD_COUNT_KEY = "recordCount";
-  public static final List<String> fields = Arrays.asList(
+  public static final List<String> SQL_INPUT_FIELDS = Arrays.asList(
           SQL_JDBC_DRIVER_CLASS_NAME_KEY,
           SQL_JDBC_URI_KEY,
           SQL_USER_NAME_KEY,
@@ -36,7 +36,9 @@ public class SqlWorkItem extends NexusWorkItemImpl {
           SQL_STATEMENT_TYPE_KEY,
           SQL_DATA_MAPPINGS,
           SQL_TABLE_NAME,
-          SQL_CSV_INPUT_KEY,
+          SQL_CSV_INPUT_KEY);
+
+  public static final List<String> SQL_OUTPUT_FIELDS = Arrays.asList(
           SQL_CSV_OUTPUT_KEY,
           SQL_RECORD_COUNT_KEY,
           WORKITEM_OUT_KEY,
@@ -52,8 +54,13 @@ public class SqlWorkItem extends NexusWorkItemImpl {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return super.getRequiredParameterNames();
+  public List<String> getRequiredInputParameterNames() {
+    return SQL_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return SQL_OUTPUT_FIELDS;
   }
 
   public String getJdbcDriverClassName() {

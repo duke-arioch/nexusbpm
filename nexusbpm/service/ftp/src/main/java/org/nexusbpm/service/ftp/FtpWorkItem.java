@@ -15,9 +15,10 @@ public class FtpWorkItem extends NexusWorkItemImpl {
   private static final long serialVersionUID = 1l;
   public static final String FTP_INPUT_FIELDNAME = "input";
   public static final String FTP_OUTPUT_FIELDNAME = "output";
-  public static final List<String> fields = Arrays.asList(
+  public static final List<String> FTP_INPUT_FIELDS = Arrays.asList(
           FTP_INPUT_FIELDNAME,
-          FTP_OUTPUT_FIELDNAME,
+          FTP_OUTPUT_FIELDNAME);
+  public static final List<String> FTP_OUTPUT_FIELDS = Arrays.asList(
           WORKITEM_OUT_KEY,
           WORKITEM_ERR_KEY,
           WORKITEM_RETURN_CODE_KEY);
@@ -31,8 +32,13 @@ public class FtpWorkItem extends NexusWorkItemImpl {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return fields;
+  public List<String> getRequiredInputParameterNames() {
+    return FTP_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return FTP_OUTPUT_FIELDS;
   }
 
   public URI getInput() {

@@ -20,7 +20,7 @@ public class ExcelWorkItem extends NexusWorkItemImpl {
   public static final String EXCEL_TEMPLATE_FILE_FIELDNAME = "templateFile";
   public static final String EXCEL_DATA_FILE_FIELDNAME = "dataFile";
   public static final String EXCEL_OUTPUT_FILE_FIELDNAME = "outputFile";
-  public static final List<String> fields = Arrays.asList(
+  public static final List<String> EXCEL_INPUT_FIELDS = Arrays.asList(
           EXCEL_SKIP_HEADER_FIELDNAME,
           EXCEL_COL_LIMIT_FIELDNAME,
           EXCEL_ANCHOR_FIELDNAME,
@@ -28,6 +28,11 @@ public class ExcelWorkItem extends NexusWorkItemImpl {
           EXCEL_SHEET_NAME_FIELDNAME,
           EXCEL_TEMPLATE_FILE_FIELDNAME,
           EXCEL_DATA_FILE_FIELDNAME,
+          WORKITEM_OUT_KEY,
+          WORKITEM_ERR_KEY,
+          WORKITEM_RETURN_CODE_KEY);
+
+  public static final List<String> EXCEL_OUTPUT_FIELDS = Arrays.asList(
           EXCEL_OUTPUT_FILE_FIELDNAME,
           WORKITEM_OUT_KEY,
           WORKITEM_ERR_KEY,
@@ -42,8 +47,13 @@ public class ExcelWorkItem extends NexusWorkItemImpl {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return fields;
+  public List<String> getRequiredInputParameterNames() {
+    return EXCEL_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return EXCEL_OUTPUT_FIELDS;
   }
 
   public Boolean isSkipHeader() {

@@ -5,10 +5,6 @@ import java.util.Map;
 
 public interface NexusWorkItem {
 
-  public static final String WORKITEM_RETURN_CODE_KEY = "returnCode";
-  public static final String WORKITEM_OUT_KEY = "out";
-  public static final String WORKITEM_ERR_KEY = "err";
-
   String getName();
 
   Map<String, Object> getParameters();
@@ -41,6 +37,11 @@ public interface NexusWorkItem {
 
   void setReturnCode(String returnCode);
 
-  List<String> getRequiredParameterNames();
+  List<String> getRequiredInputParameterNames();
 
+  List<String> getRequiredOutputParameterNames();
+
+  boolean isRequiredParameter(String name);
+
+  boolean isRequiredResult(String name);
 }

@@ -19,7 +19,8 @@ public class NexusWorkItemImpl implements NexusWorkItem {
   private Map<String, Object> parameters;
   private Map<String, Object> results;
 
-  public static final List<String> fields = Arrays.asList(WORKITEM_RETURN_CODE_KEY, WORKITEM_OUT_KEY, WORKITEM_ERR_KEY);
+  public static final List<String> NEXUS_INPUT_FIELDS = Collections.EMPTY_LIST;
+  public static final List<String> NEXUS_OUTPUT_FIELDS = Arrays.asList(WORKITEM_RETURN_CODE_KEY, WORKITEM_OUT_KEY, WORKITEM_ERR_KEY);
 
   public NexusWorkItemImpl(NexusWorkItem item) {
     super();
@@ -37,8 +38,23 @@ public class NexusWorkItemImpl implements NexusWorkItem {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return fields;
+  public boolean isRequiredParameter(String name) {
+    return getRequiredInputParameterNames().contains(name);
+  }
+
+  @Override
+  public boolean isRequiredResult(String name) {
+    return getRequiredOutputParameterNames().contains(name);
+  }
+
+  @Override
+  public List<String> getRequiredInputParameterNames() {
+    return NEXUS_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return NEXUS_OUTPUT_FIELDS;
   }
 
   @Override

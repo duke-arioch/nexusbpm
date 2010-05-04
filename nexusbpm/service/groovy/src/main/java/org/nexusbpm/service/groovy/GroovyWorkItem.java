@@ -10,11 +10,8 @@ public class GroovyWorkItem extends NexusWorkItemImpl {
 
   private static final long serialVersionUID = 1L;
   public static final String GROOVY_CODE_FIELDNAME = "code";
-  public static final List<String> fields = Arrays.asList(
-          GROOVY_CODE_FIELDNAME,
-          WORKITEM_OUT_KEY,
-          WORKITEM_ERR_KEY,
-          WORKITEM_RETURN_CODE_KEY);
+  public static final List<String> GROOVY_INPUT_FIELDS = Arrays.asList(
+          GROOVY_CODE_FIELDNAME);
 
   public GroovyWorkItem() {
     super();
@@ -25,8 +22,13 @@ public class GroovyWorkItem extends NexusWorkItemImpl {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return fields;
+  public List<String> getRequiredInputParameterNames() {
+    return GROOVY_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return NexusWorkItemImpl.NEXUS_OUTPUT_FIELDS;
   }
 
   public String getCode() {

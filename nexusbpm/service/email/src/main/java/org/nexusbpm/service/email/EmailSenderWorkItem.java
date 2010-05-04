@@ -20,7 +20,7 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
   public static final String EMAIL_SENDER_USERNAME_FIELDNAME = "username";
   public static final String EMAIL_SENDER_PASSWORD_FIELDNAME = "password";
   public static final String EMAIL_SENDER_HTML_FIELDNAME = "html";
-  public static final List<String> fields = Arrays.asList(
+  public static final List<String> EMAIL_INPUT_FIELDS = Arrays.asList(
           EMAIL_SENDER_TO_ADDRESS_FIELDNAME,
           EMAIL_SENDER_CC_ADDRESS_FIELDNAME,
           EMAIL_SENDER_BCC_ADDRESS_FIELDNAME,
@@ -32,10 +32,7 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
           EMAIL_SENDER_USE_SSL_FIELDNAME,
           EMAIL_SENDER_USERNAME_FIELDNAME,
           EMAIL_SENDER_PASSWORD_FIELDNAME,
-          EMAIL_SENDER_HTML_FIELDNAME,
-          WORKITEM_OUT_KEY,
-          WORKITEM_ERR_KEY,
-          WORKITEM_RETURN_CODE_KEY);
+          EMAIL_SENDER_HTML_FIELDNAME);
 
   public EmailSenderWorkItem() {
     super();
@@ -46,8 +43,13 @@ public class EmailSenderWorkItem extends NexusWorkItemImpl {
   }
 
   @Override
-  public List<String> getRequiredParameterNames() {
-    return fields;
+  public List<String> getRequiredInputParameterNames() {
+    return EMAIL_INPUT_FIELDS;
+  }
+
+  @Override
+  public List<String> getRequiredOutputParameterNames() {
+    return NexusWorkItemImpl.NEXUS_OUTPUT_FIELDS;
   }
 
   public String getBccAddress() {
