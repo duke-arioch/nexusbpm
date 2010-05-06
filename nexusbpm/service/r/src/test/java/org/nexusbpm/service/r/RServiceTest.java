@@ -31,7 +31,6 @@ public class RServiceTest extends NexusTestCase {
             "dev.off();\n" +
             "myfile = file(\"boxplot3.png\");\n" +
             "z=file(\"testme" + System.currentTimeMillis() + ".png\");\n" +
-            "retval=c(showConnections(TRUE)[c(z)+1,]);\n" +
             "radius <- radius + 1;\n" 
         );
         return data;

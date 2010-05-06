@@ -3,30 +3,27 @@ package org.nexusbpm.service.r;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import org.apache.commons.io.IOUtils;
+import java.util.Arrays;
+import java.util.List;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RSession;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.rosuda.REngine.Rserve.RConnection;
 
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ObjectConverter;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileUtil;
 import org.apache.commons.vfs.VFS;
 import org.nexusbpm.common.data.NexusWorkItem;
 import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngine;
+import org.rosuda.REngine.REXPString;
+import org.rosuda.REngine.RList;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -90,16 +87,33 @@ public class RServiceImpl implements NexusService {
       // process dynamic attributes: (storing attributes)
 
       REXP vars = c.eval("ls();");
-      String[] rVariables = vars.asStrings();
-      REXP f = c.eval("retval");
+      List fileCols = Arrays.asList(new String[]{
+                "description", "class", "mode", "text", "opened", "can read", "can write"});
 
+      String[] rVariables = vars.asStrings();
       for (String varname : rVariables) {
         //evaluate 'retval' and you'll get file info -
         //"myfile = file("boxplot.png");retval=showConnections(TRUE)[myfile,];";
 
-        Object varvalue = RUtils.convertREXP(c.eval(varname));
-        data.getResults().put(varname, varvalue);
-        result.append("  " + varname + "=" + varvalue + "\n");
+        String[] s = c.eval("class(" + varname + ")").asStrings();
+        String fileName = null;
+        if (s.length == 2 && "file".equals(s[0]) && "connection".equals(s[1])) {
+          fileName = c.eval("showConnections(TRUE)[" + varname + "]").asString();
+          /**
+           * now we just have to decide what to do with it - we need to pull it back from R but then what -
+           * do we need to then put the value into a variable (could be big) or do we need to put it into
+           * a file somewhere? what if theres an input var with the same name but of type uri that could go to VFS and take
+           * the input and pump it out there???
+           *
+           */
+
+          result.append("  FILE " + varname + "=" + fileName + "\n");
+        } else {
+          Object varvalue = RUtils.convertREXP(c.eval(varname));
+          data.getResults().put(varname, varvalue);
+          String printValue = varvalue == null ? "null" : varvalue.getClass().isArray() ? Arrays.asList(varvalue).toString() : varvalue.toString();
+          result.append("  " + (varvalue == null ? "" : varvalue.getClass().getSimpleName()) + " " + varname + "=" + printValue + "\n");
+        }
       }
     } catch (REXPMismatchException rme) {
       rData.setErr(rme.getMessage());

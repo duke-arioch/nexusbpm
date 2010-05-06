@@ -51,17 +51,21 @@ public class RUtils {
 
   public static Object convertREXP(REXP rexp) throws REXPMismatchException {
     Object retval = null;
-    if (rexp.isInteger() && rexp.isList()) {
+    if (rexp.isInteger() && rexp.isVector()) {
+      retval = rexp.asIntegers();
+    } else if (rexp.isInteger() && rexp.length() != 1) {
       retval = new Integer(rexp.asInteger());
-    } else if (rexp.isInteger() && !rexp.isList()) {
-      retval = new Integer(rexp.asInteger());
-    } else if (rexp.isNumeric() && !rexp.isList()) {
+    } else if (rexp.isNumeric() && rexp.length() == 1) {
       retval = new Double(rexp.asDouble());
-    } else if (rexp.isNumeric() && rexp.isList()) {
-      retval = new Double(rexp.asDouble());
-    } else if (rexp.isString() && rexp.isList()) {
+    } else if (rexp.isNumeric() && rexp.length() != 1) {
+      retval = rexp.asDoubles();
+    } else if (rexp.isString() && rexp.length() == 1) {
       retval = rexp.asString();
-    } else if (rexp.isNumeric() && rexp.isList()) {
+    } else if (rexp.isString() && rexp.length() != 1) {
+      retval = rexp.asStrings();
+    } else if (rexp.length() != 1) {
+      retval = rexp.asStrings();
+    } else {
       retval = rexp.asString();
     }
     return retval;
