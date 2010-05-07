@@ -2,6 +2,8 @@ package org.nexusbpm.service.r;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +12,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RSession;
@@ -22,8 +25,8 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.nexusbpm.common.data.NexusWorkItem;
 import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RList;
+import org.rosuda.REngine.Rserve.RFileInputStream;
+import org.rosuda.REngine.Rserve.RFileOutputStream;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -39,7 +42,6 @@ public class RServiceImpl implements NexusService {
     RConnection c = null;
     Exception ex = null;
     try {
-      data.setOut("");
       result.append("Session Attachment: \n");
       byte[] sessionBytes = rData.getSession();
       if (sessionBytes != null && sessionBytes.length > 0) {
@@ -62,12 +64,11 @@ public class RServiceImpl implements NexusService {
 
       for (String attributeName : rData.getParameters().keySet()) {
         Object parameter = rData.getParameters().get(attributeName);
-
-//this requires more thought than i can now muster                
-
         if (!rData.isRequiredParameter(attributeName)) {
           if (parameter instanceof URI) {
             FileObject file = VFS.getManager().resolveFile(((URI) parameter).toString());
+            RFileOutputStream ros = c.createFile(file.getName().getBaseName());
+            IOUtils.copy(file.getContent().getInputStream(), ros);
             c.assign(attributeName, file.getName().getBaseName());
           } else {
             c.assign(attributeName, RUtils.convertToREXP(parameter));
@@ -92,22 +93,12 @@ public class RServiceImpl implements NexusService {
 
       String[] rVariables = vars.asStrings();
       for (String varname : rVariables) {
-        //evaluate 'retval' and you'll get file info -
-        //"myfile = file("boxplot.png");retval=showConnections(TRUE)[myfile,];";
-
         String[] s = c.eval("class(" + varname + ")").asStrings();
-        String fileName = null;
         if (s.length == 2 && "file".equals(s[0]) && "connection".equals(s[1])) {
-          fileName = c.eval("showConnections(TRUE)[" + varname + "]").asString();
-          /**
-           * now we just have to decide what to do with it - we need to pull it back from R but then what -
-           * do we need to then put the value into a variable (could be big) or do we need to put it into
-           * a file somewhere? what if theres an input var with the same name but of type uri that could go to VFS and take
-           * the input and pump it out there???
-           *
-           */
-
-          result.append("  FILE " + varname + "=" + fileName + "\n");
+          RFileInputStream is = c.openFile(varname);
+          File f = File.createTempFile("nexus-" + data.getWorkItemId(), ".dat");
+          IOUtils.copy(is, new FileOutputStream(f));
+          data.getResults().put(varname, new URI("file://" + f.getAbsolutePath()));
         } else {
           Object varvalue = RUtils.convertREXP(c.eval(varname));
           data.getResults().put(varname, varvalue);
@@ -140,7 +131,7 @@ public class RServiceImpl implements NexusService {
           }
         }
         boolean close = outSession == null;
-        if (outSession != null) {
+        if (!close) {
           try {
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             ObjectOutputStream stream = new ObjectOutputStream(byteStream);
@@ -163,11 +154,9 @@ public class RServiceImpl implements NexusService {
             close = true;
           }
         }
-        if (close) {
-          c.close();
-          rData.setSession(null);
-          result.append("  session closed.\n");
-        }
+        c.close();
+        rData.setSession(null);
+        result.append("  session closed.\n");
       }
     }
     data.setOut(result.toString());
@@ -175,8 +164,7 @@ public class RServiceImpl implements NexusService {
       logger.error("R service error", ex);
       throw new NexusServiceException("R service error", ex);
     }
-//this will require more careful thought than i can now muster.
-  }// run()
+  }
 
   @Override
   public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
