@@ -29,8 +29,7 @@ public class RServiceTest extends NexusTestCase {
             "png(filename=imageLocation, width=800, height=600, bg=\"grey\");\n" +
             "plot(radius*cos(t * 5),radius*sin(t * 3), type=\"l\", col=\"blue\");\n" +
             "dev.off();\n" +
-            "myfile = file(\"boxplot3.png\");\n" +
-            "z=file(\"testme" + System.currentTimeMillis() + ".png\");\n" +
+            "myfile = file(imageLocation);\n" +
             "radius <- radius + 1;\n" 
         );
         return data;
@@ -53,8 +52,8 @@ public class RServiceTest extends NexusTestCase {
 //            JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
         }
         assertThat("radius should reflect change from R code", (Double) data.getResults().get("radius"), equalTo(1001.0D));
-        String uri = (String) data.getResults().get("imageLocation");
-        FileObject file = VFS.getManager().resolveFile(uri);
+        URI uri = (URI) data.getResults().get("myfile");
+        FileObject file = VFS.getManager().resolveFile(uri.toString());
         Assert.assertEquals(9585, file.getContent().getSize());
     }
 
@@ -68,7 +67,6 @@ public class RServiceTest extends NexusTestCase {
             r.execute(data);
             Assert.fail("Exception should have been thrown");
         } catch(NexusServiceException e) {
-            e.printStackTrace(System.out);
         }
         System.out.println("Code:\n" + data.getCode());
         System.out.println("Output:\n" + data.getOut());

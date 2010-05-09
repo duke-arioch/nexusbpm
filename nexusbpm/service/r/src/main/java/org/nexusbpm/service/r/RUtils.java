@@ -1,6 +1,10 @@
 package org.nexusbpm.service.r;
 
-import java.util.Arrays;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import org.apache.commons.lang.ArrayUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
@@ -8,7 +12,7 @@ import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPNull;
 import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.Rserve.protocol.REXPFactory;
+import org.rosuda.REngine.Rserve.RSession;
 
 public class RUtils {
 
@@ -87,6 +91,34 @@ public class RUtils {
       retval = new REXPInteger(ArrayUtils.toPrimitive((Integer[]) source));
     } else if (source instanceof Double[]) {
       retval = new REXPDouble(ArrayUtils.toPrimitive((Double[]) source));
+    }
+    return retval;
+  }
+
+  public static RSession bytesToSession(byte[] sessionBytes) {
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(sessionBytes);
+    RSession session;
+    try {
+      ObjectInputStream stream = new ObjectInputStream(byteStream);
+      session = (RSession) stream.readObject();
+    } catch (IOException exception) {
+      return null;
+    } catch (ClassNotFoundException exception) {
+      return null;
+    }
+    return session;
+  }
+
+  public static byte[] sessionToBytes(RSession outSession) {
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    byte[] retval;
+    try {
+      ObjectOutputStream stream = new ObjectOutputStream(byteStream);
+      stream.writeObject(outSession);
+      stream.flush();
+      retval = byteStream.toByteArray();
+    } catch (IOException exception) {
+      retval = null;
     }
     return retval;
   }

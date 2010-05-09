@@ -10,8 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import org.rosuda.REngine.REXP;
@@ -32,32 +32,24 @@ import org.slf4j.Logger;
 
 public class RServiceImpl implements NexusService {
 
-  public static final Logger logger = LoggerFactory.getLogger(RServiceImpl.class);
+  public static final Logger LOGGER = LoggerFactory.getLogger(RServiceImpl.class);
 
   @Override
   public void execute(NexusWorkItem data) throws NexusServiceException {
     StringBuilder result = new StringBuilder("R service call results:\n");
     RWorkItem rData = (RWorkItem) data;
-    RSession session = null;
-    RConnection c = null;
-    Exception ex = null;
+    RSession session;
+    RConnection connection = null;
     try {
       result.append("Session Attachment: \n");
       byte[] sessionBytes = rData.getSession();
       if (sessionBytes != null && sessionBytes.length > 0) {
-        ByteArrayInputStream byteStream = new ByteArrayInputStream(sessionBytes);
-        ObjectInputStream stream = new ObjectInputStream(byteStream);
-        session = (RSession) stream.readObject();
-      }
-      if (session != null) {
+        session = RUtils.bytesToSession(sessionBytes);
         result.append("  attaching to " + session + "\n");
-        c = session.attach();
+        connection = session.attach();
       } else {
         result.append("  creating new session\n");
-      }
-      // connect to Rserve if we didn't attach to a session yet
-      if (c == null) {
-        c = new RConnection(rData.getServerAddress());
+        connection = new RConnection(rData.getServerAddress());
       }
       // assign any necessary data from incoming attributes
       result.append("Input Parameters: \n");
@@ -67,16 +59,16 @@ public class RServiceImpl implements NexusService {
         if (!rData.isRequiredParameter(attributeName)) {
           if (parameter instanceof URI) {
             FileObject file = VFS.getManager().resolveFile(((URI) parameter).toString());
-            RFileOutputStream ros = c.createFile(file.getName().getBaseName());
+            RFileOutputStream ros = connection.createFile(file.getName().getBaseName());
             IOUtils.copy(file.getContent().getInputStream(), ros);
-            c.assign(attributeName, file.getName().getBaseName());
+            connection.assign(attributeName, file.getName().getBaseName());
           } else {
-            c.assign(attributeName, RUtils.convertToREXP(parameter));
+            connection.assign(attributeName, RUtils.convertToREXP(parameter));
           }
           result.append("  " + parameter.getClass().getSimpleName() + " " + attributeName + "=" + parameter + "\n");
         }
       }
-      REXP x = c.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
+      REXP x = connection.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
       result.append("Execution results:\n" + x.asString() + "\n");
       if (x.isNull() || x.asString().startsWith("Error")) {
         // only error has an attribute (the class)
@@ -85,85 +77,55 @@ public class RServiceImpl implements NexusService {
         throw new NexusServiceException("R error: " + x.asString());
       }
       result.append("Output Parameters:\n");
-      // process dynamic attributes: (storing attributes)
-
-      REXP vars = c.eval("ls();");
-      List fileCols = Arrays.asList(new String[]{
-                "description", "class", "mode", "text", "opened", "can read", "can write"});
-
-      String[] rVariables = vars.asStrings();
+      String[] rVariables = connection.eval("ls();").asStrings();
       for (String varname : rVariables) {
-        String[] s = c.eval("class(" + varname + ")").asStrings();
+        String[] s = connection.eval("class(" + varname + ")").asStrings();
         if (s.length == 2 && "file".equals(s[0]) && "connection".equals(s[1])) {
-          RFileInputStream is = c.openFile(varname);
+          String rFileName = connection.eval("showConnections(TRUE)[" + varname + "]").asString();
+          result.append("  R File " + varname + "=" + rFileName + "\n");
+          RFileInputStream rInputStream = connection.openFile(rFileName);
           File f = File.createTempFile("nexus-" + data.getWorkItemId(), ".dat");
-          IOUtils.copy(is, new FileOutputStream(f));
-          data.getResults().put(varname, new URI("file://" + f.getAbsolutePath()));
+          IOUtils.copy(rInputStream, new FileOutputStream(f));
+          data.getResults().put(varname, f.getCanonicalFile().toURI());
         } else {
-          Object varvalue = RUtils.convertREXP(c.eval(varname));
+          Object varvalue = RUtils.convertREXP(connection.eval(varname));
           data.getResults().put(varname, varvalue);
           String printValue = varvalue == null ? "null" : varvalue.getClass().isArray() ? Arrays.asList(varvalue).toString() : varvalue.toString();
           result.append("  " + (varvalue == null ? "" : varvalue.getClass().getSimpleName()) + " " + varname + "=" + printValue + "\n");
         }
       }
+    } catch (RserveException rse) {
+      rData.setErr(rse.getMessage());
+      LOGGER.error("Rserve Exception", rse);
     } catch (REXPMismatchException rme) {
       rData.setErr(rme.getMessage());
-      ex = rme;
-    } catch (RserveException re) {
-      rData.setErr(re.getRequestErrorDescription());
-      ex = re;
-    } catch (Exception e) {
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      rData.setErr(sw.toString());
-      // e.printStackTrace();
-      ex = e;
+      LOGGER.error("REXP Mismatch Exception", rme);
+    } catch (IOException rme) {
+      rData.setErr(rme.getMessage());
+      LOGGER.error("IO Exception copying file ", rme);
     } finally {
       result.append("Session Detachment:\n");
-      if (c != null) {
+      if (connection != null) {
         RSession outSession = null;
         if (rData.isKeepSession() != null
                 && rData.isKeepSession().booleanValue()) {
           try {
-            outSession = c.detach();
+            outSession = connection.detach();
           } catch (RserveException e) {
-            logger.debug("Error detaching R session", e);
+            LOGGER.debug("Error detaching R session", e);
           }
         }
         boolean close = outSession == null;
         if (!close) {
-          try {
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-            ObjectOutputStream stream = new ObjectOutputStream(byteStream);
-            stream.writeObject(outSession);
-            stream.flush();
-            rData.setSession(byteStream.toByteArray());
-            result.append("  Session: " + session + "\n");
-            result.append("  suspended session for later use\n");
-          } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            if (rData.getErr() != null && rData.getErr().length() > 0) {
-              pw.println(rData.getErr());
-              pw.println();
-            }
-            pw.println("Error detaching session!");
-            e.printStackTrace(pw);
-            rData.setErr(sw.toString());
-            result.append("  Error detaching session!\n");
-            close = true;
-          }
+          rData.setSession(RUtils.sessionToBytes(outSession));
+          result.append("  suspended session for later use\n");
         }
-        c.close();
+        connection.close();
         rData.setSession(null);
         result.append("  session closed.\n");
       }
     }
     data.setOut(result.toString());
-    if (ex != null) {
-      logger.error("R service error", ex);
-      throw new NexusServiceException("R service error", ex);
-    }
   }
 
   @Override
