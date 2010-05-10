@@ -40,15 +40,11 @@ public class RServiceTest extends NexusTestCase {
         RServiceImpl r = new RServiceImpl();
         RWorkItem data = getPlotData();
         r.execute(data);
-        System.out.println(data.getCode());
-        System.out.println(data.getOut());
-        System.out.println(data.getErr());
-
         if (data.getErr() != null) {
             Assert.fail("R command did not complete properly due to " + data.getErr());
         }
         else {
-            System.out.println(data.getResults().get("imageLocation"));
+            ImageIcon icon = new ImageIcon(((URI)data.getResults().get("myfile")).toURL());
 //            JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
         }
         assertThat("radius should reflect change from R code", (Double) data.getResults().get("radius"), equalTo(1001.0D));
