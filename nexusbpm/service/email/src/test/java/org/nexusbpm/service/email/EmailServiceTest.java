@@ -1,21 +1,22 @@
 package org.nexusbpm.service.email;
 
 import com.dumbster.smtp.SimpleSmtpServer;
+import com.dumbster.smtp.SmtpMessage;
+import java.io.OutputStream;
 import java.net.URI;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.VFS;
 import org.junit.After;
 
 import org.nexusbpm.common.NexusTestCase;
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterType;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 public class EmailServiceTest extends NexusTestCase {
 
-  private Parameter attachment;
+//  private Parameter attachment;
   protected EmailSenderWorkItem data = new EmailSenderWorkItem();
   SimpleSmtpServer server;
 
@@ -30,8 +31,13 @@ public class EmailServiceTest extends NexusTestCase {
     data.setWorkItemId("1-100");
     data.setSubject("test from EmailServiceTest");
     URI path = URI.create("res:testfile.xml");
-    attachment = new Parameter("myfile", ParameterType.ASCII_FILE, path, false, Parameter.DIRECTION_INPUT);
-    data.getParameters().put("attachment1", attachment);
+    FileObject fileObject = VFS.getManager().resolveFile(path.toString());
+    fileObject.createFile();
+    OutputStream ostream = fileObject.getContent().getOutputStream();
+    ostream.write("HI THERE".getBytes());
+    ostream.flush();
+    ostream.close();
+    data.getParameters().put("attachment1", path);
     server = SimpleSmtpServer.start();
   }
 
@@ -48,33 +54,9 @@ public class EmailServiceTest extends NexusTestCase {
     EmailSenderServiceImpl service = new EmailSenderServiceImpl();
     service.execute(data);
     assertThat("should receive one email.", server.getReceivedEmailSize(), equalTo(1));
-  }
-
-  @Ignore
-  public void testGmail() throws Exception { //usually wont work in a firewall
-    data.setFromAddress(getProperty("test.email.gmail.user"));
-    data.setHost("smtp.gmail.com");
-    data.setPort("465");
-    data.setUsername("!!!");
-    data.setPassword("!!!");
-    data.setSecure(Boolean.TRUE);
-    data.setToAddress("!!!");
-    data.getParameters().put("attachment", attachment);
-    EmailSenderServiceImpl service = new EmailSenderServiceImpl();
-    service.execute(data);
-  }
-
-  @Ignore
-  public void testGoDaddy() throws Exception {//only works with a godaddy account
-    data.setHost("smtpout.secureserver.net");
-    data.setPort("3535");
-    data.setUsername("!!!");
-    data.setPassword("!!!");
-    data.setSecure(Boolean.FALSE);
-    data.setFromAddress("!!!");
-    data.getParameters().put("attachment", attachment);
-    EmailSenderServiceImpl service = new EmailSenderServiceImpl();
-    service.execute(data);
+    SmtpMessage message = (SmtpMessage) server.getReceivedEmail().next();
+    assertThat("email must have an attachment", message.getBody().contains("attachment; filename=testfile.xml"), is(true));
+    assertThat("attachment must contain HI THERE", message.getBody().contains("HI THERE"), is(true));
   }
   /* save these as a reminder of some of the settings I ran into should we need
    * to do further work...

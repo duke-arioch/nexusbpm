@@ -20,7 +20,6 @@ import java.util.Set;
 import org.codehaus.groovy.GroovyException;
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
 
-import org.nexusbpm.common.data.ParameterType;
 import java.net.URI;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;

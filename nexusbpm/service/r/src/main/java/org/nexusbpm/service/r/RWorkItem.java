@@ -5,16 +5,13 @@ import java.util.List;
 import org.nexusbpm.common.data.NexusWorkItem;
 import org.nexusbpm.common.data.NexusWorkItemImpl;
 
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterType;
-
 public class RWorkItem extends NexusWorkItemImpl {
 
-  private static final long serialVersionUID = 1L;
-  static String R_CODE_FIELDNAME = "code";
-  static String R_KEEP_SESSION_FIELDNAME = "keepSession";
-  static String R_SERVER_ADDRESS_FIELDNAME = "serverAddress";
-  static String R_SESSION_FIELDNAME = "session";
+  public static final long serialVersionUID = 1L;
+  public static final String R_CODE_FIELDNAME = "code";
+  public static final  String R_KEEP_SESSION_FIELDNAME = "keepSession";
+  public static final  String R_SERVER_ADDRESS_FIELDNAME = "serverAddress";
+  public static final  String R_SESSION_FIELDNAME = "session";
   public static final List<String> R_INPUT_FIELDS = Arrays.asList(
           R_CODE_FIELDNAME,
           R_KEEP_SESSION_FIELDNAME,
@@ -85,5 +82,4 @@ public class RWorkItem extends NexusWorkItemImpl {
   public void setKeepSession(Boolean keepSession) {
     getParameters().put(R_KEEP_SESSION_FIELDNAME, keepSession);
   }
-
 }

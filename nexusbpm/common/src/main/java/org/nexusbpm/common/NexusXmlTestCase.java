@@ -2,8 +2,6 @@ package org.nexusbpm.common;
 
 import java.io.IOException;
 
-import org.nexusbpm.common.data.Parameter;
-import org.nexusbpm.common.data.ParameterType;
 import org.nexusbpm.common.data.ObjectConverter;
 
 public class NexusXmlTestCase extends NexusTestCase {
