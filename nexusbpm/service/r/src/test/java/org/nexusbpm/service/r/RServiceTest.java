@@ -49,7 +49,7 @@ public class RServiceTest extends NexusTestCase {
 //    ImageIcon icon = new ImageIcon(uri.toURL());
 //    JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
     FileObject file = VFS.getManager().resolveFile(uri.toString());
-    Assert.assertEquals(9585, file.getContent().getSize());
+    assertThat("File size must be 9585", file.getContent().getSize(), equalTo(9585L));
   }
 
   @Test

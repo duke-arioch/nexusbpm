@@ -39,7 +39,7 @@ public class GroovyServiceImpl implements NexusService {
       binding.setVariable("err", errWriter);
       shell.evaluate(jData.getCode());
 
-      // Process dynamic attributes (get attribute values out of the Jython interpreter).
+      // Process dynamic attributes (get attribute values out of the interpreter).
       data.getResults().putAll(binding.getVariables());
     } catch (Exception e) {
       if (errWriter.toString().length() > 0) {
