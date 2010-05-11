@@ -43,7 +43,7 @@
           <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
           <value>true</value>
         </parameter>
-        <parameter name="host" >
+        <parameter name="Host" >
           <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
           <value>localhost</value>
         </parameter>
@@ -64,6 +64,7 @@
         </parameter>
         <parameter name="To" >
           <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+          <value>MeMyself@i.com</value>
         </parameter>
         <parameter name="User" >
           <type name="org.drools.process.core.datatype.impl.type.StringDataType" />

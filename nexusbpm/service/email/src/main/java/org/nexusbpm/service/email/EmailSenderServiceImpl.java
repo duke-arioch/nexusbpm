@@ -26,7 +26,7 @@ import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
-import org.nexusbpm.common.data.NexusWorkItem;
+import org.nexusbpm.service.NexusServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +37,9 @@ public class EmailSenderServiceImpl implements NexusService {
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailSenderServiceImpl.class);
 
   @Override
-  public void execute(NexusWorkItem workItem) throws NexusServiceException {
-    EmailSenderWorkItem eData = (EmailSenderWorkItem) workItem;
+  public EmailSenderServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
+    EmailSenderServiceResponse retval = null;
+    EmailSenderServiceRequest eData = (EmailSenderServiceRequest) inData;
     String to = null;
     String cc = null;
     String bcc = null;
@@ -48,7 +49,7 @@ public class EmailSenderServiceImpl implements NexusService {
     String subject = null;
     String body = null;
     String host = null;
-    String port = null;
+    int port;
     boolean useSSL = false;
     boolean html = false;
     StringBuffer b = new StringBuffer();
@@ -63,8 +64,8 @@ public class EmailSenderServiceImpl implements NexusService {
       body = eData.getBody();
       host = eData.getHost();
       port = eData.getPort();
-      useSSL = eData.useSSL() != null && eData.useSSL().booleanValue();
-      html = eData.getHTML().booleanValue();
+      useSSL = eData.isUseSSL();
+      html = eData.isHtml();
 
       b = b.append("to: ").append(to).append(", cc: ").append(cc).append(", bcc: ").append(bcc).append(", from: ").append(from).append(", username: ").append(username).append(", subject: ").append(subject).append(", host: ").append(host);
 
@@ -74,18 +75,20 @@ public class EmailSenderServiceImpl implements NexusService {
     } catch (Exception e) {
       LOGGER.error("Error sending email!\n" + b.toString(), e);
       throw new NexusServiceException("Error sending email!", e);
+    } finally {
+      return retval;
     }
   }
 
   //Get a session and send the email
   public void send(String to, String cc, String bcc, String from,
           String user, String password,
-          String subject, String body, String host, String port, boolean isSecure,
+          String subject, String body, String host, int port, boolean isSecure,
           boolean html,
-          EmailSenderWorkItem data)
+          EmailSenderServiceRequest data)
           throws AddressException, MessagingException, IOException {
     Message message = null;
-    Session session = getSession(host, port, isSecure, user, password, from);
+    Session session = getSession(host, Integer.toString(port), isSecure, user, password, from);
     message = new MimeMessage(session);
     message.setHeader("X-Mailer", MAILER);
     message.setSentDate(new Date());
@@ -143,8 +146,8 @@ public class EmailSenderServiceImpl implements NexusService {
     return session;
   }
 
-  private void attachFiles(Multipart mp, EmailSenderWorkItem data) throws IOException, MessagingException {
-    for (Object value : data.getParameters().values()) {
+  private void attachFiles(Multipart mp, EmailSenderServiceRequest data) throws IOException, MessagingException {
+    for (Object value : data.getInputVariables().values()) {
       if (value instanceof URI) {
         FileObject file = VFS.getManager().resolveFile(((URI) value).toString());
 
@@ -158,11 +161,6 @@ public class EmailSenderServiceImpl implements NexusService {
         mp.addBodyPart(part);
       }
     }
-  }
-
-  @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem workItem) {
-    return new EmailSenderWorkItem(workItem);
   }
 
   private class PasswordAuthenticator extends Authenticator {

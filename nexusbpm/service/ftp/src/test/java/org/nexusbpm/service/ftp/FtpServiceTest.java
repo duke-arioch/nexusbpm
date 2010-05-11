@@ -1,7 +1,7 @@
 package org.nexusbpm.service.ftp;
 
 import org.nexusbpm.service.ftp.FtpServiceImpl;
-import org.nexusbpm.service.ftp.FtpWorkItem;
+import org.nexusbpm.service.ftp.FtpServiceRequest;
 import java.net.URI;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
@@ -46,7 +46,7 @@ public class FtpServiceTest {
     @Test
     public void testRoundtrip() throws Exception {
         FtpServiceImpl service = new FtpServiceImpl();
-        FtpWorkItem data = new FtpWorkItem();
+        FtpServiceRequest data = new FtpServiceRequest();
         data.setInput(new URI("res:testfile.xml"));
         data.setOutput(new URI("ftp://nexusbpm:nexusbpm@localhost/remotefile.xml"));
         service.execute(data);

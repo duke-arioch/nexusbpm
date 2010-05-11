@@ -9,13 +9,14 @@ import java.io.StringWriter;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import java.util.Map;
-import org.nexusbpm.common.data.NexusWorkItem;
+import org.nexusbpm.service.NexusServiceRequest;
 
 public class GroovyServiceImpl implements NexusService {
 
   @Override
-  public void execute(NexusWorkItem data) throws NexusServiceException {
-    GroovyWorkItem jData = (GroovyWorkItem) data;
+  public GroovyServiceResponse execute(NexusServiceRequest data) throws NexusServiceException {
+    GroovyServiceResponse retval = new GroovyServiceResponse();
+    GroovyServiceRequest jData = (GroovyServiceRequest) data;
     StringWriter out = new StringWriter();
     StringWriter err = new StringWriter();
     PrintWriter outputWriter = new PrintWriter(out);
@@ -28,7 +29,7 @@ public class GroovyServiceImpl implements NexusService {
       GroovyShell shell = new GroovyShell(binding);
 
       // get a copy of the dynamic variables
-      Map<String, Object> variables = jData.getParameters();
+      Map<String, Object> variables = jData.getInputVariables();
       // Process dynamic attributes (put attribute values into the interpreter).
       for (Map.Entry<String, Object> entry : variables.entrySet()) {
         binding.setVariable(entry.getKey(), entry.getValue());
@@ -40,7 +41,7 @@ public class GroovyServiceImpl implements NexusService {
       shell.evaluate(jData.getCode());
 
       // Process dynamic attributes (get attribute values out of the interpreter).
-      data.getResults().putAll(binding.getVariables());
+      retval.getOutputVariables().putAll(binding.getVariables());
     } catch (Exception e) {
       if (errWriter.toString().length() > 0) {
         errWriter.write("\n");
@@ -48,17 +49,14 @@ public class GroovyServiceImpl implements NexusService {
       e.printStackTrace(new PrintWriter(errWriter));
       e.printStackTrace(System.err);
       ex = e;
+    } finally {
+      retval.setOut(out.getBuffer().toString());
+      retval.setErr(err.getBuffer().toString());
+      if (ex != null) {
+        throw new NexusServiceException("groovy exception", ex);
+      }
+      return retval;
     }
 
-    jData.setOut(out.getBuffer().toString());
-    jData.setErr(err.getBuffer().toString());
-    if (ex != null) {
-      throw new NexusServiceException("groovy exception", ex);
-    }
-  }
-
-  @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
-    return new GroovyWorkItem(item);
   }
 }

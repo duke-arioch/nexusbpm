@@ -21,9 +21,10 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.VFS;
 import org.apache.velocity.app.VelocityEngine;
-import org.nexusbpm.common.data.NexusWorkItem;
 import org.nexusbpm.common.data.ObjectConversionException;
 import org.nexusbpm.service.NexusService;
+import org.nexusbpm.service.NexusServiceRequest;
+import org.nexusbpm.service.NexusServiceResponse;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -35,13 +36,9 @@ public class SqlServiceImpl implements NexusService {
   public VelocityEngine velocityEngine;
 
   @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
-    return new SqlWorkItem(item);
-  }
-
-  @Override
-  public void execute(NexusWorkItem genericWorkItem) throws NexusServiceException {
-    SqlWorkItem workItem = new SqlWorkItem(genericWorkItem);
+  public SqlServiceResponse execute(NexusServiceRequest genericWorkItem) throws NexusServiceException {
+    SqlServiceResponse retval = new SqlServiceResponse();
+    SqlServiceRequest workItem = (SqlServiceRequest) genericWorkItem;
     /*
      * process:
      *
@@ -77,7 +74,7 @@ public class SqlServiceImpl implements NexusService {
         ds.accept(visitor);
       }
     } catch (Exception e) {
-      workItem.setErr(e.getMessage());
+      retval.setErr(e.getMessage());
       logger.error("Error in sql statement", e);
       throw new NexusServiceException("Error in SQL service!", e);
     } finally {
@@ -96,21 +93,20 @@ public class SqlServiceImpl implements NexusService {
       } catch (IOException e) {
         logger.warn("couldnt close printer file");
       }
+      return retval;
     }
 
   }
 
-  protected CSVPrinter getPrinter(SqlWorkItem workItem) throws FileSystemException {
+  protected CSVPrinter getPrinter(SqlServiceRequest workItem) throws FileSystemException {
     CSVPrinter retval = null;
-    if (workItem.getCsvOutputUri() != null) {
       FileObject file = VFS.getManager().resolveFile(workItem.getCsvOutputUri().toString());
       OutputStream ostream = file.getContent().getOutputStream();
       retval = new CSVPrinter(ostream);
-    }
     return retval;
   }
 
-  protected CSVParser getParser(SqlWorkItem workItem) throws FileSystemException {
+  protected CSVParser getParser(SqlServiceRequest workItem) throws FileSystemException {
     CSVParser retval = null;
     if (workItem.getCsvInputUri() != null) {
       FileObject file = VFS.getManager().resolveFile(workItem.getCsvInputUri().toString());
@@ -120,7 +116,7 @@ public class SqlServiceImpl implements NexusService {
     return retval;
   }
 
-  protected void executeIgnoringErrors(Connection connection, SqlWorkItem workItem) throws SQLException {
+  protected void executeIgnoringErrors(Connection connection, SqlServiceRequest workItem, SqlServiceResponse response) throws SQLException {
     Statement statement = null;
     String[] statements = DatabaseUtils.parse(workItem.getSqlCode());
     StringWriter sw = new StringWriter();
@@ -151,74 +147,74 @@ public class SqlServiceImpl implements NexusService {
           logger.debug("Error in SQL statement ignored", e);
         }
       }
-      workItem.setErr(sw.toString());
-      workItem.setAffectedRecordCount(Long.valueOf(affectedRows));
+      response.setErr(sw.toString());
+      response.setRecordCount(affectedRows);
     } finally {
       DbUtils.commitAndCloseQuietly(connection);
     }
   }
 
-  protected void execute(PreparedStatement statement, String type, SqlWorkItem workItem) throws SQLException, IOException, ObjectConversionException {
-    try {
-      // if the statement type is a query, then we'll save the first statement that returns a
-      // result set, otherwise we sum up the update counts of the statements that return
-      // no result sets
-      boolean awaitingResults = type.equals(SqlWorkItem.QUERY_SQL_TYPE);
-      int affectedRows = 0;
+//  protected void execute(PreparedStatement statement, String type, SqlServiceRequest workItem, SqlServiceResponse response) throws SQLException, IOException, ObjectConversionException {
+//    try {
+//      // if the statement type is a query, then we'll save the first statement that returns a
+//      // result set, otherwise we sum up the update counts of the statements that return
+//      // no result sets
+//      boolean awaitingResults = type.equals(SqlServiceRequest.QUERY_SQL_TYPE);
+//      int affectedRows = 0;
+//
+//      // loop through and execute the statements
+//      boolean b = statement.execute();
+//
+//      if (b) {
+//        if (awaitingResults) {
+//          // if this statement returned a result set and we're still waiting to save one
+//          // then save the result set to a CSV
+//          awaitingResults = false;
+//          ResultSet rs = null;
+//          rs = statement.getResultSet();
+////            DatabaseUtils.saveResultSet(rs, sData);
+//        }
+//      } else {
+//        int count = statement.getUpdateCount();
+//        if (count > 0) {
+//          affectedRows += count;
+//        }
+//      }
+//      response.setRecordCount(affectedRows);
+//    } finally {
+//    }
+//  }
 
-      // loop through and execute the statements
-      boolean b = statement.execute();
-
-      if (b) {
-        if (awaitingResults) {
-          // if this statement returned a result set and we're still waiting to save one
-          // then save the result set to a CSV
-          awaitingResults = false;
-          ResultSet rs = null;
-          rs = statement.getResultSet();
-//            DatabaseUtils.saveResultSet(rs, sData);
-        }
-      } else {
-        int count = statement.getUpdateCount();
-        if (count > 0) {
-          affectedRows += count;
-        }
-      }
-      workItem.setAffectedRecordCount(Long.valueOf(affectedRows));
-    } finally {
-    }
-  }
-
-  protected void executeInsert(PreparedStatement statement, CSVParser parser, List<String> parameters) throws SQLException, IOException, ObjectConversionException {
-    String[] csvColumns;
-    try {
-      if (parser != null) {
-        csvColumns = parser.getLine();
-        if (csvColumns.length < 1) {
-          return;
-        }
-        String[] row = parser.getLine();
-        while (row != null) {
-          for (int index = 0; index < csvColumns.length; index++) {
-            Object value = row.length > index ? row[index] : null;
-            statement.setObject(index, value);
-          }
-          statement.execute();
-          row = parser.getLine();
-        }
-      } else {
-        statement.execute();
-      }
-    } finally {
-      if (parser != null) {
-        try {
-          parser.close();
-        } catch (Exception e) {
-        }
-      }
-      return;
-    }
-  }
+//  protected void executeInsert(PreparedStatement statement, CSVParser parser, List<String> parameters) throws SQLException, IOException, ObjectConversionException {
+//    String[] csvColumns;
+//    try {
+//      if (parser != null) {
+//        csvColumns = parser.getLine();
+//        if (csvColumns.length < 1) {
+//          return;
+//        }
+//        String[] row = parser.getLine();
+//        while (row != null) {
+//          for (int index = 0; index < csvColumns.length; index++) {
+//            Object value = row.length > index ? row[index] : null;
+//            statement.setObject(index, value);
+//          }
+//          statement.execute();
+//          row = parser.getLine();
+//        }
+//      } else {
+//        statement.execute();
+//      }
+//    } finally {
+//      if (parser != null) {
+//        try {
+//          parser.close();
+//        } catch (Exception e) {
+//        }
+//      }
+//      return;
+//    }
+//  }
 
   public void setVelocityEngine(VelocityEngine velocityEngine) {
     this.velocityEngine = velocityEngine;

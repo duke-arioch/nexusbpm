@@ -62,9 +62,9 @@ public class DatabaseUtils {
   }
 
 
-  public static Connection getConnection(SqlWorkItem data) throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
+  public static Connection getConnection(SqlServiceRequest data) throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
     Connection connection = null;
-    Class cl = Class.forName(data.getJdbcDriverClassName());
+    Class cl = Class.forName(data.getJdbcDriverClass());
     Driver driver = (Driver) cl.newInstance();
     Properties properties = new Properties();
     if (data.getUserName() != null && data.getUserName().length() > 0) {
@@ -218,11 +218,11 @@ public class DatabaseUtils {
     return null;
   }
 
-  public static void saveResultSet(ResultSet results, SqlWorkItem sData) throws SQLException, IOException, ObjectConversionException {
+  private static void saveResultSet(ResultSet results, SqlServiceRequest sData, SqlServiceResponse response) throws SQLException, IOException, ObjectConversionException {
     com.Ostermiller.util.CSVPrinter csvPrinter = null;
     OutputStream ostream = null;
     ResultSetMetaData rsmd = results.getMetaData();
-    FileObject file = VFS.getManager().resolveFile(sData.getCsvOutputUri().toString());
+    FileObject file = VFS.getManager().resolveFile(sData.getRequestId() + ".csv");
     String columnNames[] = new String[rsmd.getColumnCount()];
     for (int column = 1; column <= rsmd.getColumnCount(); column++) {
       columnNames[column - 1] = rsmd.getColumnName(column);
@@ -260,7 +260,7 @@ public class DatabaseUtils {
         csvPrinter.println(columnValues);
         recordCount++;
       }
-      sData.setAffectedRecordCount(Long.valueOf(recordCount));
+      response.setRecordCount(recordCount);
     } finally {
       if (csvPrinter != null) {
         try {

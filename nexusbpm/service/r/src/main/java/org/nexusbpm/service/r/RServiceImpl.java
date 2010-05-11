@@ -16,7 +16,7 @@ import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
-import org.nexusbpm.common.data.NexusWorkItem;
+import org.nexusbpm.service.NexusServiceRequest;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RFileInputStream;
 import org.rosuda.REngine.Rserve.RFileOutputStream;
@@ -28,44 +28,43 @@ public class RServiceImpl implements NexusService {
   public static final Logger LOGGER = LoggerFactory.getLogger(RServiceImpl.class);
 
   @Override
-  public void execute(NexusWorkItem data) throws NexusServiceException {
+  public RServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
+    RServiceRequest data = (RServiceRequest) inData;
+    RServiceResponse retval = new RServiceResponse();
     StringBuilder result = new StringBuilder("R service call results:\n");
-    RWorkItem rData = (RWorkItem) data;
     RSession session;
     RConnection connection = null;
     try {
       result.append("Session Attachment: \n");
-      byte[] sessionBytes = rData.getSession();
+      byte[] sessionBytes = data.getSession();
       if (sessionBytes != null && sessionBytes.length > 0) {
         session = RUtils.bytesToSession(sessionBytes);
         result.append("  attaching to " + session + "\n");
         connection = session.attach();
       } else {
         result.append("  creating new session\n");
-        connection = new RConnection(rData.getServerAddress());
+        connection = new RConnection(data.getServerAddress());
       }
       // assign any necessary data from incoming attributes
       result.append("Input Parameters: \n");
 
-      for (String attributeName : rData.getParameters().keySet()) {
-        Object parameter = rData.getParameters().get(attributeName);
-        if (!rData.isRequiredParameter(attributeName)) {
-          if (parameter instanceof URI) {
-            FileObject file = VFS.getManager().resolveFile(((URI) parameter).toString());
-            RFileOutputStream ros = connection.createFile(file.getName().getBaseName());
-            IOUtils.copy(file.getContent().getInputStream(), ros);
-            connection.assign(attributeName, file.getName().getBaseName());
-          } else {
-            connection.assign(attributeName, RUtils.convertToREXP(parameter));
-          }
-          result.append("  " + parameter.getClass().getSimpleName() + " " + attributeName + "=" + parameter + "\n");
+      for (String attributeName : data.getInputVariables().keySet()) {
+        Object parameter = data.getInputVariables().get(attributeName);
+        if (parameter instanceof URI) {
+          FileObject file = VFS.getManager().resolveFile(((URI) parameter).toString());
+          RFileOutputStream ros = connection.createFile(file.getName().getBaseName());
+          IOUtils.copy(file.getContent().getInputStream(), ros);
+          connection.assign(attributeName, file.getName().getBaseName());
+        } else {
+          connection.assign(attributeName, RUtils.convertToREXP(parameter));
         }
+        result.append("  " + parameter.getClass().getSimpleName() + " " + attributeName + "=" + parameter + "\n");
       }
-      REXP x = connection.eval(RUtils.wrapCode(rData.getCode().replace('\r', '\n')));
+      REXP x = connection.eval(RUtils.wrapCode(data.getCode().replace('\r', '\n')));
       result.append("Execution results:\n" + x.asString() + "\n");
       if (x.isNull() || x.asString().startsWith("Error")) {
         // only error has an attribute (the class)
-        data.setErr(x.asString());
+        retval.setErr(x.asString());
         // what should we do after an error?
         throw new NexusServiceException("R error: " + x.asString());
       }
@@ -77,31 +76,30 @@ public class RServiceImpl implements NexusService {
           String rFileName = connection.eval("showConnections(TRUE)[" + varname + "]").asString();
           result.append("  R File " + varname + "=" + rFileName + "\n");
           RFileInputStream rInputStream = connection.openFile(rFileName);
-          File f = File.createTempFile("nexus-" + data.getWorkItemId(), ".dat");
+          File f = File.createTempFile("nexus-" + data.getRequestId(), ".dat");
           IOUtils.copy(rInputStream, new FileOutputStream(f));
-          data.getResults().put(varname, f.getCanonicalFile().toURI());
+          retval.getOutputVariables().put(varname, f.getCanonicalFile().toURI());
         } else {
           Object varvalue = RUtils.convertREXP(connection.eval(varname));
-          data.getResults().put(varname, varvalue);
+          retval.getOutputVariables().put(varname, varvalue);
           String printValue = varvalue == null ? "null" : varvalue.getClass().isArray() ? Arrays.asList(varvalue).toString() : varvalue.toString();
           result.append("  " + (varvalue == null ? "" : varvalue.getClass().getSimpleName()) + " " + varname + "=" + printValue + "\n");
         }
       }
     } catch (RserveException rse) {
-      rData.setErr(rse.getMessage());
+      retval.setErr(rse.getMessage());
       LOGGER.error("Rserve Exception", rse);
     } catch (REXPMismatchException rme) {
-      rData.setErr(rme.getMessage());
+      retval.setErr(rme.getMessage());
       LOGGER.error("REXP Mismatch Exception", rme);
     } catch (IOException rme) {
-      rData.setErr(rme.getMessage());
+      retval.setErr(rme.getMessage());
       LOGGER.error("IO Exception copying file ", rme);
     } finally {
       result.append("Session Detachment:\n");
       if (connection != null) {
         RSession outSession = null;
-        if (rData.isKeepSession() != null
-                && rData.isKeepSession().booleanValue()) {
+        if (retval.isKeepSession()) {
           try {
             outSession = connection.detach();
           } catch (RserveException e) {
@@ -110,19 +108,16 @@ public class RServiceImpl implements NexusService {
         }
         boolean close = outSession == null;
         if (!close) {
-          rData.setSession(RUtils.sessionToBytes(outSession));
+          retval.setSession(RUtils.sessionToBytes(outSession));
           result.append("  suspended session for later use\n");
         }
         connection.close();
-        rData.setSession(null);
+        retval.setSession(null);
         result.append("  session closed.\n");
       }
     }
-    data.setOut(result.toString());
+    retval.setOut(result.toString());
+    return retval;
   }
 
-  @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
-    return new RWorkItem(item);
-  }
 }

@@ -33,62 +33,65 @@ public class SqlServiceTest {
   public void testMultiQuery() throws Exception {
 
     SqlServiceImpl c = new SqlServiceImpl();
-    SqlWorkItem data = new SqlWorkItem();
-    data.setJdbcDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+    SqlServiceRequest data = new SqlServiceRequest();
+    SqlServiceResponse response;
+    data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
     data.setJdbcUri(URI.create("jdbc:derby:memory:unit-testing;create=true"));
     data.setUserName("");
     data.setPassword("");
     data.setSqlCode("#set ($apple = \"'RED'\") \r\nSELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1 WHERE 'RED' = ${apple};#set ($apple = \"'GREEN'\") \r\nSELECT CURRENT_TIMESTAMP FROM SYSIBM.SYSDUMMY1 WHERE 'GREEN' = ${apple}");
     data.setCsvOutputUri(new URI("tmp:///temp1.csv"));
-    data.setStatementType(SqlWorkItem.QUERY_SQL_TYPE);
-    c.execute(data);
+    data.setStatementType(SqlServiceRequest.QUERY_SQL_TYPE);
+    response = c.execute(data);
     FileContent content = VFS.getManager().resolveFile(data.getCsvOutputUri().toString()).getContent();
     InputStream stream = content.getInputStream();
     String result = org.apache.commons.io.IOUtils.toString(stream);
     stream.close();
     content.close();
     System.out.println(result);
-    System.out.println(data.getOut());
-    System.err.println(data.getErr());
+    System.out.println(response.getOut());
+    System.err.println(response.getErr());
   }
 
   @Test
   public void testDDL() throws Exception {
     SqlServiceImpl c = new SqlServiceImpl();
-    SqlWorkItem data = new SqlWorkItem();
-    data.setJdbcDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+    SqlServiceRequest data = new SqlServiceRequest();
+    SqlServiceResponse response;
+    data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
     data.setJdbcUri(URI.create("jdbc:derby:memory:unit-testing;create=true"));
     data.setUserName("");
     data.setPassword("");
     data.setSqlCode("create table TEST_DROP (COL CHAR(1))");
     data.setCsvOutputUri(new URI("tmp:///temp2.csv"));
-    data.setStatementType(SqlWorkItem.DDL_SQL_TYPE);
-    c.execute(data);
-    System.out.println(data.getErr());
+    data.setStatementType(SqlServiceRequest.DDL_SQL_TYPE);
+    response = c.execute(data);
+    System.out.println(response.getErr());
     System.out.println(data.getCsvOutputUri());
-    assertTrue(data.getErr() == null || data.getErr().equals(""));
+    assertTrue(response.getErr() == null || response.getErr().equals(""));
     data.setSqlCode("drop table TEST_DROP");
     c.execute(data);
-    assertTrue(data.getErr() == null || data.getErr().equals(""));
+    assertTrue(response.getErr() == null || response.getErr().equals(""));
   }
 
   @Ignore @Test //needs to be refactored for Derby
   public void testBatchInsert() throws Exception {
     SqlServiceImpl svc = new SqlServiceImpl();
+    SqlServiceResponse response;
 
     // drop the table if it exists (in case we're following a previous test case)
-    SqlWorkItem data = new SqlWorkItem();
-    data.setJdbcDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+    SqlServiceRequest data = new SqlServiceRequest();
+    data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
     data.setJdbcUri(URI.create("jdbc:derby:memory:unit-testing;create=true"));
-    data.setStatementType(SqlWorkItem.DDL_SQL_TYPE);
+    data.setStatementType(SqlServiceRequest.DDL_SQL_TYPE);
     data.setSqlCode("DROP TABLE testtable;");
     svc.execute(data);
 
     // create the table
-    data = new SqlWorkItem();
-    data.setJdbcDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+    data = new SqlServiceRequest();
+    data.setJdbcDriverClass("org.apache.derby.jdbc.EmbeddedDriver");
     data.setJdbcUri(URI.create("jdbc:derby:memory:unit-testing;create=true"));
-    data.setStatementType(SqlWorkItem.DDL_SQL_TYPE);
+    data.setStatementType(SqlServiceRequest.DDL_SQL_TYPE);
     data.setSqlCode("CREATE TABLE testtable ("
             + "id_ BIGINT NOT NULL, "
             + "date_ TIMESTAMP, "

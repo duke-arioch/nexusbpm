@@ -1,7 +1,5 @@
 package org.nexusbpm.service;
 
-import org.nexusbpm.common.data.NexusWorkItem;
-
 /**
  * Base interface that all Nexus Services extend.
  * 
@@ -10,7 +8,5 @@ import org.nexusbpm.common.data.NexusWorkItem;
  */
 public interface NexusService {
 
-  void execute(NexusWorkItem item) throws NexusServiceException;
-
-  NexusWorkItem createCompatibleWorkItem(NexusWorkItem item);
+  NexusServiceResponse execute(NexusServiceRequest request) throws NexusServiceException;
 }

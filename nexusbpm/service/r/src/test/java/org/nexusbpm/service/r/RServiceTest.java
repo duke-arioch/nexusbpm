@@ -29,11 +29,11 @@ public class RServiceTest extends NexusTestCase {
           + "radius <- radius + 1;\n";
   private String unique = "output-" + System.currentTimeMillis();
 
-  private RWorkItem getPlotData() throws Exception {
-    RWorkItem data = new RWorkItem();
+  private RServiceRequest getPlotData() throws Exception {
+    RServiceRequest data = new RServiceRequest();
     data.setServerAddress("localhost");
-    data.getParameters().put("radius", new Integer(1000));
-    data.getParameters().put("imageLocation", "test.png");
+    data.getInputVariables().put("radius", new Integer(1000));
+    data.getInputVariables().put("imageLocation", "test.png");
     data.setCode(imageCode);
     return data;
   }
@@ -41,11 +41,11 @@ public class RServiceTest extends NexusTestCase {
   @Test
   public void testRPlottingWithOutputGraph() throws Exception {
     RServiceImpl service = new RServiceImpl();
-    RWorkItem data = getPlotData();
-    service.execute(data);
-    assertThat("plot R command must not return error " + data.getErr(), data.getErr(), nullValue());
-    assertThat("radius should reflect change from R code", (Double) data.getResults().get("radius"), equalTo(1001.0D));
-    URI uri = (URI) data.getResults().get("myfile");
+    RServiceRequest data = getPlotData();
+    RServiceResponse response = service.execute(data);
+    assertThat("plot R command must not return error " + response.getErr(), response.getErr(), nullValue());
+    assertThat("radius should reflect change from R code", (Double) response.getOutputVariables().get("radius"), equalTo(1001.0D));
+    URI uri = (URI) response.getOutputVariables().get("myfile");
 //    ImageIcon icon = new ImageIcon(uri.toURL());
 //    JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
     FileObject file = VFS.getManager().resolveFile(uri.toString());
@@ -55,14 +55,15 @@ public class RServiceTest extends NexusTestCase {
   @Test
   public void testRSyntaxExceptionHandling() throws Exception {
     RServiceImpl service = new RServiceImpl();
-    RWorkItem data = new RWorkItem();
+    RServiceRequest data = new RServiceRequest();
+    RServiceResponse response = service.execute(data);
     data.setCode("xxx");
     data.setServerAddress(getProperty("test.r.server"));
     try {
-      service.execute(data);
+      response = service.execute(data);
       Assert.fail("Exception should have been thrown");
     } catch (NexusServiceException e) {
     }
-    Assert.assertTrue(data.getErr().contains("Error in try({ : object 'xxx' not found"));
+    Assert.assertTrue(response.getErr().contains("Error in try({ : object 'xxx' not found"));
   }
 }

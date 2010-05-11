@@ -8,7 +8,7 @@ import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.ftp.FtpFileSystemConfigBuilder;
-import org.nexusbpm.common.data.NexusWorkItem;
+import org.nexusbpm.service.NexusServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +17,9 @@ public class FtpServiceImpl implements NexusService {
   public final static Logger LOGGER = LoggerFactory.getLogger(FtpServiceImpl.class);
 
   @Override
-  public void execute(NexusWorkItem inData) throws NexusServiceException {
-    FtpWorkItem data = (FtpWorkItem) inData;
+  public FtpServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
+    FtpServiceResponse retval = new FtpServiceResponse();
+    FtpServiceRequest data = (FtpServiceRequest) inData;
     try {
       FileSystemManager manager = VFS.getManager();
       FileSystemOptions opts = new FileSystemOptions();
@@ -29,11 +30,9 @@ public class FtpServiceImpl implements NexusService {
     } catch (Exception e) {
       LOGGER.error("FTP Service error!", e);
       throw new NexusServiceException("Error in FTP service!", e);
+    } finally {
+      return retval;
     }
   }
 
-  @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem item) {
-    return new FtpWorkItem(item);
-  }
 }

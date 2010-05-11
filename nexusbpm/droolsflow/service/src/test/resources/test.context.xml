@@ -25,20 +25,111 @@
 
   <bean id="emailService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.email.EmailSenderServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.email.EmailSenderServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="To" value="toAddress"/>
+        <entry key="BCC" value="bcc"/>
+        <entry key="Body" value="body"/>
+        <entry key="CC" value="cc"/>
+        <entry key="From" value="fromAddress"/>
+        <entry key="HTML" value="html"/>
+        <entry key="Host" value="host"/>
+        <entry key="Password" value="password"/>
+        <entry key="Port" value="port"/>
+        <entry key="SSL" value="ssl"/>
+        <entry key="Subject" value="subject"/>
+        <entry key="User" value="user"/>
+      </map>
+    </property>
   </bean>
   <bean id="excelService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.excel.ExcelServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.excel.ExcelServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="To" value="toAddress"/>
+        <entry key="BCC" value="bcc"/>
+        <entry key="Body" value="body"/>
+        <entry key="CC" value="cc"/>
+        <entry key="From" value="from"/>
+        <entry key="HTML" value="html"/>
+        <entry key="Host" value="host"/>
+        <entry key="Password" value="password"/>
+        <entry key="Port" value="port"/>
+        <entry key="SSL" value="ssl"/>
+        <entry key="Subject" value="subject"/>
+        <entry key="User" value="user"/>
+      </map>
+    </property>
   </bean>
   <bean id="ftpService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.ftp.FtpServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.ftp.FtpServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="To" value="toAddress"/>
+        <entry key="BCC" value="bcc"/>
+        <entry key="Body" value="body"/>
+        <entry key="CC" value="cc"/>
+        <entry key="From" value="from"/>
+        <entry key="HTML" value="html"/>
+        <entry key="Host" value="host"/>
+        <entry key="Password" value="password"/>
+        <entry key="Port" value="port"/>
+        <entry key="SSL" value="ssl"/>
+        <entry key="Subject" value="subject"/>
+        <entry key="User" value="user"/>
+      </map>
+    </property>
   </bean>
   <bean id="groovyService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.groovy.GroovyServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.groovy.GroovyServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="code" value="code"/>
+      </map>
+    </property>
   </bean>
   <bean id="rService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.r.RServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.r.RServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="To" value="toAddress"/>
+        <entry key="BCC" value="bcc"/>
+        <entry key="Body" value="body"/>
+        <entry key="CC" value="cc"/>
+        <entry key="From" value="from"/>
+        <entry key="HTML" value="html"/>
+        <entry key="Host" value="host"/>
+        <entry key="Password" value="password"/>
+        <entry key="Port" value="port"/>
+        <entry key="SSL" value="ssl"/>
+        <entry key="Subject" value="subject"/>
+        <entry key="User" value="user"/>
+      </map>
+    </property>
   </bean>
   <bean id="sqlService" class="org.nexusbpm.droolsflow.service.impl.NexusWorkItemHandler">
     <property name="service"><bean class="org.nexusbpm.service.sql.SqlServiceImpl" /></property>
+    <property name="serviceRequestClassName" value="org.nexusbpm.service.sql.SqlServiceRequest"/>
+    <property name="propertyMap">
+      <map>
+        <entry key="To" value="toAddress"/>
+        <entry key="BCC" value="bcc"/>
+        <entry key="Body" value="body"/>
+        <entry key="CC" value="cc"/>
+        <entry key="From" value="from"/>
+        <entry key="HTML" value="html"/>
+        <entry key="Host" value="host"/>
+        <entry key="Password" value="password"/>
+        <entry key="Port" value="port"/>
+        <entry key="SSL" value="ssl"/>
+        <entry key="Subject" value="subject"/>
+        <entry key="User" value="user"/>
+      </map>
+    </property>
   </bean>
 </beans>

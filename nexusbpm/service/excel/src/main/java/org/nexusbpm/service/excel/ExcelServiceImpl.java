@@ -1,9 +1,11 @@
 package org.nexusbpm.service.excel;
 
+import java.net.URI;
 import org.nexusbpm.service.NexusService;
 import org.nexusbpm.service.NexusServiceException;
-import org.apache.commons.vfs.FileObject;
-import org.nexusbpm.common.data.NexusWorkItem;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.VFS;
+import org.nexusbpm.service.NexusServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +25,15 @@ public class ExcelServiceImpl implements NexusService {
   private static final Logger logger = LoggerFactory.getLogger(ExcelServiceImpl.class);
 
   @Override
-  public void execute(NexusWorkItem data) throws NexusServiceException {
-    ExcelWorkItem exData = (ExcelWorkItem) data;
+  public ExcelServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
+    ExcelServiceResponse retval = null;
+    ExcelServiceRequest exData = (ExcelServiceRequest) inData;
 
-    FileObject template = exData.getTemplateFile();
-    FileObject inputData = exData.getDataFile();
-    FileObject output = exData.getOutputFile();
+    URI template = exData.getTemplateFile();
+    URI inputData = exData.getDataFile();
+    URI output = exData.getOutputFile();
+    try {
+    FileSystemManager fsManager = VFS.getManager();
 
     // The Excel service must have a CSV file from which to draw data.
     if (inputData == null) {
@@ -40,40 +45,31 @@ public class ExcelServiceImpl implements NexusService {
       throw new NexusServiceException("There is no Excel file to insert data into.");
     }
 
-    try {
       String sheetName = exData.getSheetName();
 
       // Initialize an object with a common interface, regardless of whether we
       // are using Extentech's ExtenXLS library or Apache's POI library.
-      ExcelPOIObject excelObject = new ExcelPOIObject(template, sheetName);
+      ExcelPOIObject excelObject = new ExcelPOIObject(fsManager.resolveFile(template.toString()), sheetName);
 
-      excelObject.setOutputStreamProvider(output);
+      excelObject.setOutputStreamProvider(fsManager.resolveFile(template.toString()));
       excelObject.initialize();
 
-      String anchorString = exData.getAnchor();
-      boolean skipHeader = exData.isSkipHeader() != null && exData.isSkipHeader().booleanValue();
-      int rowLimit = -1;
-      if (exData.getRowLimit() != null && exData.getRowLimit().intValue() > 0) {
-        rowLimit = exData.getRowLimit().intValue();
-      }
-      int colLimit = -1;
-      if (exData.getColLimit() != null && exData.getColLimit().intValue() > 0) {
-        colLimit = exData.getColLimit().intValue();
-      }
+      String anchorString = exData.getExcelAnchor();
+      boolean skipHeader = exData.isSkipHeader();
+      int rowLimit = exData.getRowLimit();
+      int colLimit = exData.getColumnLimit();
 
-      logger.debug("Inserting into sheet " + sheetName + " at " + anchorString + " as " + output.getName().getURI());
+      logger.debug("Inserting into sheet " + sheetName + " at " + anchorString + " as " + output.toString());
       int rows = excelObject.insertTableAtAnchor(
-              inputData, anchorString, skipHeader, rowLimit, colLimit);
+              fsManager.resolveFile(inputData.toString()), anchorString, skipHeader, rowLimit, colLimit);
       excelObject.save();
       logger.debug("Finished adding " + rows + " rows into spreadsheet");
 
     } catch (Exception e) {
       throw new NexusServiceException("Exception in Excel service", e);
+    } finally {
+      return retval;
     }
-  } //run()
 
-  @Override
-  public NexusWorkItem createCompatibleWorkItem(NexusWorkItem workItem) {
-    return new ExcelWorkItem(workItem);
-  }
+  } //run()
 }
