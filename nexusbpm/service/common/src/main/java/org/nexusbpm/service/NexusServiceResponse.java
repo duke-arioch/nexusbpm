@@ -2,6 +2,7 @@ package org.nexusbpm.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class NexusServiceResponse {
 
@@ -43,4 +44,8 @@ public class NexusServiceResponse {
     this.returnCode = returnCode;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
+  }
 }

@@ -113,5 +113,4 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
   public void setUsername(String username) {
     this.username = username;
   }
-
 }

@@ -4,10 +4,13 @@ package org.nexusbpm.droolsflow.service;
  *
  * @author Matthew Sandoz
  */
+import com.dumbster.smtp.SimpleSmtpServer;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import javax.annotation.Resource;
+import org.junit.After;
+import org.junit.Before;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,17 @@ public class RuleFlowTest {
 
   @Resource
   private SimpleDroolsFlowExecutionService executionService;
+  private SimpleSmtpServer server;
+
+  @Before
+  public void setUp() throws Exception {
+    server = SimpleSmtpServer.start();
+  }
+
+  @After
+  public void tearDown() {
+    server.stop();
+  }
 
   @Test
   public void testAFlow() throws Exception {

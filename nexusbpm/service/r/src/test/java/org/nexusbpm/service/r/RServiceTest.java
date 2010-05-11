@@ -56,14 +56,12 @@ public class RServiceTest extends NexusTestCase {
   public void testRSyntaxExceptionHandling() throws Exception {
     RServiceImpl service = new RServiceImpl();
     RServiceRequest data = new RServiceRequest();
-    RServiceResponse response = service.execute(data);
     data.setCode("xxx");
     data.setServerAddress(getProperty("test.r.server"));
     try {
-      response = service.execute(data);
+      RServiceResponse response = service.execute(data);
       Assert.fail("Exception should have been thrown");
     } catch (NexusServiceException e) {
     }
-    Assert.assertTrue(response.getErr().contains("Error in try({ : object 'xxx' not found"));
   }
 }

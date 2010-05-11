@@ -38,7 +38,7 @@ public class EmailSenderServiceImpl implements NexusService {
 
   @Override
   public EmailSenderServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
-    EmailSenderServiceResponse retval = null;
+    EmailSenderServiceResponse retval = new EmailSenderServiceResponse();
     EmailSenderServiceRequest eData = (EmailSenderServiceRequest) inData;
     String to = null;
     String cc = null;
@@ -67,9 +67,7 @@ public class EmailSenderServiceImpl implements NexusService {
       useSSL = eData.isUseSSL();
       html = eData.isHtml();
 
-      b = b.append("to: ").append(to).append(", cc: ").append(cc).append(", bcc: ").append(bcc).append(", from: ").append(from).append(", username: ").append(username).append(", subject: ").append(subject).append(", host: ").append(host);
-
-      LOGGER.debug(b.toString());
+      LOGGER.debug("Email Request:" + eData.toString());
 
       send(to, cc, bcc, from, username, password, subject, body, host, port, useSSL, html, eData);
     } catch (Exception e) {

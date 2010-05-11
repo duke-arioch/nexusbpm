@@ -2,6 +2,7 @@ package org.nexusbpm.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class NexusServiceRequest {
 
@@ -23,5 +24,10 @@ public class NexusServiceRequest {
 
   public void setRequestId(String requestId) {
     this.requestId = requestId;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 }
