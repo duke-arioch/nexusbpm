@@ -14,7 +14,7 @@ public class SqlServiceResponse extends NexusServiceResponse {
     return recordCount;
   }
 
-  public void setRecordCount(long recordCount) {
+  public void setRecordCount(final long recordCount) {
     this.recordCount = recordCount;
   }
 }

@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Base64;
 
@@ -23,52 +24,58 @@ import org.apache.commons.vfs.VFS;
 
 public class ObjectConverter {
 
-  public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd";
-  public static final String ISO8601_TIME_FORMAT = "HH:mm:ss.SSSZ";
-  public static final String ISO8601_DATETIME_FORMAT = ISO8601_DATE_FORMAT + "'T'" + ISO8601_TIME_FORMAT;
-  public static final String JDBC_DATE_FORMAT = ISO8601_DATE_FORMAT;
-  public static final String JDBC_TIME_FORMAT = "HH:mm:ss";
+  private ObjectConverter() {}
+
+  public static final String ISO8601_DF = "yyyy-MM-dd";
+  public static final String ISO8601_TF = "HH:mm:ss.SSSZ";
+  public static final String ISO8601_DTF = ISO8601_DF + "'T'" + ISO8601_TF;
+  public static final String JDBC_DF = ISO8601_DF;
+  public static final String JDBC_TF = "HH:mm:ss";
   // SimpleDateFormat is not sufficient for JDBC Datetime format: the following
   // string will recognize a JDBC timestamp value, but will leave off the nanoseconds
-  public static final String JDBC_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+  public static final String JDBC_DTF = "yyyy-MM-dd HH:mm:ss.SSS";
   public static final String JDBC_DATE_REGEX = "\\d{4}-\\d{2}-\\d{2}";
   public static final String JDBC_TIME_REGEX = "\\d{2}:\\d{2}:\\d{2}";
   public static final String JDBC_DATETIME_REGEX =
           JDBC_DATE_REGEX + " " + JDBC_TIME_REGEX + "([.]\\d{1,9})?";
-  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_DATE_FORMAT =
-          new SimpleDateFormatThreadLocal(ISO8601_DATE_FORMAT);
-  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_TIME_FORMAT =
-          new SimpleDateFormatThreadLocal(ISO8601_TIME_FORMAT);
-  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_DATETIME_FORMAT =
-          new SimpleDateFormatThreadLocal(ISO8601_DATETIME_FORMAT);
-  private static final ThreadLocal<SimpleDateFormat> LOCAL_JDBC_TIME_FORMAT =
-          new SimpleDateFormatThreadLocal(JDBC_TIME_FORMAT);
-  private static final ThreadLocal<SimpleDateFormat> LOCAL_JDBC_DATETIME_FORMAT =
-          new SimpleDateFormatThreadLocal(JDBC_DATETIME_FORMAT);
+  public static final String TO_A_BIGINTEGER = " to a BigInteger.";
+  public static final String UNABLE_TO_CONVERT_A_ = "Unable to convert a ";
+  public static final String _INSTEAD_USE_ = ". Instead use ";
+  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_DF =
+          new SimpleDateFormatThreadLocal(ISO8601_DF);
+  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_TF =
+          new SimpleDateFormatThreadLocal(ISO8601_TF);
+  private static final ThreadLocal<SimpleDateFormat> LOCAL_ISO8601_DTF =
+          new SimpleDateFormatThreadLocal(ISO8601_DTF);
+  private static final ThreadLocal<SimpleDateFormat> LOCAL_JDBC_TF =
+          new SimpleDateFormatThreadLocal(JDBC_TF);
+  private static final ThreadLocal<SimpleDateFormat> LOCAL_JDBC_DTF =
+          new SimpleDateFormatThreadLocal(JDBC_DTF);
   private static final Pattern LOCAL_JDBC_DATE_REGEX = Pattern.compile(JDBC_DATE_REGEX);
   private static final Pattern LOCAL_JDBC_TIME_REGEX = Pattern.compile(JDBC_TIME_REGEX);
   private static final Pattern LOCAL_JDBC_DATETIME_REGEX = Pattern.compile(JDBC_DATETIME_REGEX);
 
   private static class SimpleDateFormatThreadLocal extends ThreadLocal<SimpleDateFormat> {
 
-    private final String format;
+    private transient final String format;
 
-    public SimpleDateFormatThreadLocal(String format) {
+    public SimpleDateFormatThreadLocal(final String format) {
+      super();
       this.format = format;
     }
 
     @Override
     protected SimpleDateFormat initialValue() {
-      return new SimpleDateFormat(format);
+      return new SimpleDateFormat(format, Locale.US);
     }
   }
 
-  public static Object convert(Object source, Class dest) throws ObjectConversionException {
+  public static Object convert(final Object source, final Class dest) throws ObjectConversionException {
     if (dest == null) {
       throw new ObjectConversionException("Unable to convert to a null type!");
     }
     try {
-      Object result = null;
+      final Object result;
       if (source == null) {
         result = null;
       } else if (source.getClass().equals(dest)) {
@@ -107,20 +114,16 @@ public class ObjectConverter {
         throw new IllegalArgumentException("Type " + dest.getName() + " not supported!");
       }
       return result;
-    } catch (Exception e) {
+    } catch (IOException e) {
       throw new ObjectConversionException("Unable to convert to type " + dest.getSimpleName(), e);
     }
-  }
-
-  public static Object convert(Object source) {
-    return convert(source, false);
   }
 
   /**
    * @param sql whether SQL Date/Time classes should be preferred for
    *            parsing over java.util.Date
    */
-  public static Object convert(Object source, boolean sql) {
+  public static Object convert(final Object source, final boolean sql) {
     // try to convert the value if it's not null, but leave certain object types alone
     if (source != null
             && !(source instanceof URI
@@ -133,8 +136,8 @@ public class ObjectConverter {
 
       // first see if it's some sort of serialized object
       try {
-        Object value = convertToObject(source);
-        if (value != null && value != source) {
+        final Object value = convertToObject(source);
+        if (value != null && !value.equals(source)) {
           return value;
         }
       } catch (Exception e) {
@@ -142,32 +145,27 @@ public class ObjectConverter {
 
       // convert the string and trimmed string ahead of time so
       // that they can be reused without having to be recomputed
-      String sourceString = null;
-      String sourceStringTrimmed = null;
-      try {
-        if (!source.getClass().isArray()) {
-          sourceString = source.toString();
-          sourceStringTrimmed = sourceString.trim();
-        }
-      } catch (Exception e) {
+      final String sourceString;
+      final String sourceStringTrimmed;
+      if (!source.getClass().isArray()) {
+        sourceString = source.toString();
+        sourceStringTrimmed = sourceString.trim();
+      } else {
+        sourceStringTrimmed = null;
       }
 
       // try to turn it into an integer value, preferring the smallest
       // type that can hold the value
       try {
         if (sourceStringTrimmed != null) {
-          BigInteger bigint = new BigInteger(sourceStringTrimmed);
-          long value = bigint.longValue();
+          final BigInteger bigint = new BigInteger(sourceStringTrimmed);
+          final long value = bigint.longValue();
           if (bigint.compareTo(BigInteger.valueOf(value)) != 0) {
             return bigint;
           } else if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
             return Long.valueOf(value);
           } else if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
             return Integer.valueOf((int) value);
-          } else if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
-            return Short.valueOf((short) value);
-          } else {
-            return Byte.valueOf((byte) value);
           }
         }
       } catch (Exception e) {
@@ -177,13 +175,13 @@ public class ObjectConverter {
       // smallest type that can hold the value
       try {
         if (sourceStringTrimmed != null) {
-          BigDecimal bigdec = new BigDecimal(sourceStringTrimmed);
-          double value = bigdec.doubleValue();
+          final BigDecimal bigdec = new BigDecimal(sourceStringTrimmed);
+          final double value = bigdec.doubleValue();
           if (value == Double.POSITIVE_INFINITY || value == Double.NEGATIVE_INFINITY
                   || bigdec.compareTo(BigDecimal.valueOf(value)) != 0) {
             return bigdec;
           }
-          float fvalue = bigdec.floatValue();
+          final float fvalue = bigdec.floatValue();
           if (fvalue == Float.POSITIVE_INFINITY || fvalue == Float.NEGATIVE_INFINITY
                   || bigdec.compareTo(BigDecimal.valueOf(fvalue)) != 0) {
             return Double.valueOf(value);
@@ -217,24 +215,24 @@ public class ObjectConverter {
       }
 
       // try to parse a date using the ISO format
-      ParsePosition position = new ParsePosition(0);
+      final ParsePosition position = new ParsePosition(0);
       try {
         return parseDate(
-                LOCAL_ISO8601_DATETIME_FORMAT.get(),
+                LOCAL_ISO8601_DTF.get(),
                 sourceStringTrimmed,
                 position);
       } catch (Exception e) {
       }
       try {
         return parseDate(
-                LOCAL_ISO8601_TIME_FORMAT.get(),
+                LOCAL_ISO8601_TF.get(),
                 sourceStringTrimmed,
                 position);
       } catch (Exception e) {
       }
       try {
         return parseDate(
-                LOCAL_ISO8601_DATE_FORMAT.get(),
+                LOCAL_ISO8601_DF.get(),
                 sourceStringTrimmed,
                 position);
       } catch (Exception e) {
@@ -246,14 +244,14 @@ public class ObjectConverter {
         // SQL date is the same as the ISO date, so we can skip that one
         try {
           return parseDate(
-                  LOCAL_JDBC_DATETIME_FORMAT.get(),
+                  LOCAL_JDBC_DTF.get(),
                   sourceStringTrimmed,
                   position);
         } catch (Exception e) {
         }
         try {
           return parseDate(
-                  LOCAL_JDBC_TIME_FORMAT.get(),
+                  LOCAL_JDBC_TF.get(),
                   sourceStringTrimmed,
                   position);
         } catch (Exception e) {
@@ -272,19 +270,19 @@ public class ObjectConverter {
     return source;
   }
 
-  protected static Date parseDate(SimpleDateFormat format, String text, ParsePosition position)
+  protected static Date parseDate(final SimpleDateFormat format, final String text, final ParsePosition position)
           throws ObjectConversionException {
-    int index = position.getIndex();
-    Date d = format.parse(text, position);
-    if (d == null || position.getIndex() < text.length()) {
+    final int index = position.getIndex();
+    final Date date = format.parse(text, position);
+    if (date == null || position.getIndex() < text.length()) {
       position.setIndex(index);
       throw new ObjectConversionException("Could not parse '" + text + "'");
     }
-    return d;
+    return date;
   }
 
-  public static Double convertToDouble(Object source) throws ObjectConversionException {
-    Double result = null;
+  public static Double convertToDouble(final Object source) throws ObjectConversionException {
+    Double result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -305,16 +303,16 @@ public class ObjectConverter {
       try {
         result = (Double) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Double.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Double.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Double.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Double.");
     }
     return result;
   }
 
-  public static Float convertToFloat(Object source) throws ObjectConversionException {
-    Float result = null;
+  public static Float convertToFloat(final Object source) throws ObjectConversionException {
+    Float result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -335,16 +333,16 @@ public class ObjectConverter {
       try {
         result = (Float) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Float.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Float.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Float.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Float.");
     }
     return result;
   }
 
-  public static Long convertToLong(Object source) throws ObjectConversionException {
-    Long result = null;
+  public static Long convertToLong(final Object source) throws ObjectConversionException {
+    Long result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -365,16 +363,16 @@ public class ObjectConverter {
       try {
         result = (Long) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Long.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Long.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Long.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Long.");
     }
     return result;
   }
 
-  public static Integer convertToInteger(Object source) throws ObjectConversionException {
-    Integer result = null;
+  public static Integer convertToInteger(final Object source) throws ObjectConversionException {
+    Integer result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -386,25 +384,25 @@ public class ObjectConverter {
         }
       }
     } else if (source instanceof Number) {
-      result = new Integer(new Long(Math.round(((Number) source).doubleValue())).toString());
+      result = Integer.parseInt(Long.valueOf(Math.round(((Number) source).doubleValue())).toString());
     } else if (source instanceof Boolean) {
-      result = new Integer(((Boolean) source).booleanValue() ? 1 : 0);
+      result = ((Boolean) source).booleanValue() ? 1 : 0;
     } else if (source instanceof Date) {
-      result = new Integer(new Long(((Date) source).getTime()).toString());
+      result = Integer.parseInt(Long.valueOf(((Date) source).getTime()).toString());
     } else if (source instanceof byte[]) {
       try {
         result = (Integer) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to an Integer.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an Integer.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to an Integer.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an Integer.");
     }
     return result;
   }
 
-  public static BigInteger convertToBigInteger(Object source) throws ObjectConversionException {
-    BigInteger result = null;
+  public static BigInteger convertToBigInteger(final Object source) throws ObjectConversionException {
+    BigInteger result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -425,16 +423,16 @@ public class ObjectConverter {
       try {
         result = (BigInteger) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a BigInteger.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + TO_A_BIGINTEGER, e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a BigInteger.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + TO_A_BIGINTEGER);
     }
     return result;
   }
 
-  public static BigDecimal convertToBigDecimal(Object source) throws ObjectConversionException {
-    BigDecimal result = null;
+  public static BigDecimal convertToBigDecimal(final Object source) throws ObjectConversionException {
+    BigDecimal result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -455,16 +453,16 @@ public class ObjectConverter {
       try {
         result = (BigDecimal) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a BigInteger.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + TO_A_BIGINTEGER, e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a BigInteger.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + TO_A_BIGINTEGER);
     }
     return result;
   }
 
-  public static Boolean convertToBoolean(Object source) throws ObjectConversionException {
-    Boolean result = null;
+  public static Boolean convertToBoolean(final Object source) throws ObjectConversionException {
+    Boolean result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = Boolean.FALSE;
@@ -481,15 +479,15 @@ public class ObjectConverter {
       try {
         result = (Boolean) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Boolean.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Boolean.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a Boolean.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Boolean.");
     }
     return result;
   }
 
-  public static Date convertToDate(Object source) throws ObjectConversionException {
+  public static Date convertToDate(final Object source) throws ObjectConversionException {
     Date result = null;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
@@ -499,10 +497,10 @@ public class ObjectConverter {
           result = (Date) toObject(base64Decode((String) source));
         } catch (Exception e) {
           try {
-            result = LOCAL_ISO8601_DATETIME_FORMAT.get().parse((String) source);
+            result = LOCAL_ISO8601_DTF.get().parse((String) source);
           } catch (Exception ex) {
             try {
-              result = LOCAL_ISO8601_TIME_FORMAT.get().parse((String) source);
+              result = LOCAL_ISO8601_TF.get().parse((String) source);
             } catch (Exception exc) {
             }
             if (result == null) {
@@ -519,11 +517,11 @@ public class ObjectConverter {
             }
             if (result == null) {
               try {
-                result = LOCAL_ISO8601_DATE_FORMAT.get().parse((String) source);
+                result = LOCAL_ISO8601_DF.get().parse((String) source);
               } catch (Exception exc) {
                 throw new ObjectConversionException(
                         "Unable to convert String to Date using String's date format:"
-                        + source.toString() + ". Instead use " + ISO8601_DATETIME_FORMAT, ex);
+                        + source.toString() + _INSTEAD_USE_ + ISO8601_DTF, exc);
               }
             }
           }
@@ -536,19 +534,19 @@ public class ObjectConverter {
         result = (Date) toObject((byte[]) source);
       } catch (Exception e) {
         throw new ObjectConversionException(
-                "Unable to convert a " + source.getClass().getName() + " to a Date.", e);
+                UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Date.", e);
       }
     } else if (source instanceof Date) {
       result = new Date(((Date) source).getTime());
     } else {
       throw new ObjectConversionException(
-              "Unable to convert a " + source.getClass().getName() + " to a Date.");
+              UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a Date.");
     }
     return result;
   }
 
-  public static java.sql.Date convertToSQLDate(Object source) throws ObjectConversionException {
-    java.sql.Date result = null;
+  public static java.sql.Date convertToSQLDate(final Object source) throws ObjectConversionException {
+    java.sql.Date result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -564,7 +562,7 @@ public class ObjectConverter {
             } catch (Exception exc) {
               throw new ObjectConversionException(
                       "Unable to convert String to SQL Date using JDBC Date format:"
-                      + source.toString() + ". Instead use " + JDBC_DATE_FORMAT, ex);
+                      + source.toString() + _INSTEAD_USE_ + JDBC_DF, exc);
             }
           }
         }
@@ -576,19 +574,19 @@ public class ObjectConverter {
         result = (java.sql.Date) toObject((byte[]) source);
       } catch (Exception e) {
         throw new ObjectConversionException(
-                "Unable to convert a " + source.getClass().getName() + " to an SQL Date.", e);
+                UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Date.", e);
       }
     } else if (source instanceof Date) {
       result = new java.sql.Date(((Date) source).getTime());
     } else {
       throw new ObjectConversionException(
-              "Unable to convert a " + source.getClass().getName() + " to an SQL Date.");
+              UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Date.");
     }
     return result;
   }
 
-  public static java.sql.Time convertToSQLTime(Object source) throws ObjectConversionException {
-    java.sql.Time result = null;
+  public static java.sql.Time convertToSQLTime(final Object source) throws ObjectConversionException {
+    java.sql.Time result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -604,7 +602,7 @@ public class ObjectConverter {
             } catch (Exception exc) {
               throw new ObjectConversionException(
                       "Unable to convert String to SQL Time using JDBC Time format:"
-                      + source.toString() + ". Instead use " + JDBC_TIME_FORMAT, ex);
+                      + source.toString() + _INSTEAD_USE_ + JDBC_TF, exc);
             }
           }
         }
@@ -616,19 +614,19 @@ public class ObjectConverter {
         result = (java.sql.Time) toObject((byte[]) source);
       } catch (Exception e) {
         throw new ObjectConversionException(
-                "Unable to convert a " + source.getClass().getName() + " to an SQL Time.", e);
+                UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Time.", e);
       }
     } else if (source instanceof Date) {
       result = new java.sql.Time(((Date) source).getTime());
     } else {
       throw new ObjectConversionException(
-              "Unable to convert a " + source.getClass().getName() + " to an SQL Time.");
+              UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Time.");
     }
     return result;
   }
 
-  public static java.sql.Timestamp convertToSQLTimestamp(Object source) throws ObjectConversionException {
-    java.sql.Timestamp result = null;
+  public static java.sql.Timestamp convertToSQLTimestamp(final Object source) throws ObjectConversionException {
+    java.sql.Timestamp result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -644,7 +642,7 @@ public class ObjectConverter {
             } catch (Exception exc) {
               throw new ObjectConversionException(
                       "Unable to convert String to SQL Date using JDBC Timestamp format:"
-                      + source.toString() + ". Instead use " + JDBC_DATETIME_FORMAT, ex);
+                      + source.toString() + _INSTEAD_USE_ + JDBC_DTF, exc);
             }
           }
         }
@@ -656,18 +654,18 @@ public class ObjectConverter {
         result = (java.sql.Timestamp) toObject((byte[]) source);
       } catch (Exception e) {
         throw new ObjectConversionException(
-                "Unable to convert a " + source.getClass().getName() + " to an SQL Timestamp.", e);
+                UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Timestamp.", e);
       }
     } else if (source instanceof Date) {
       result = new java.sql.Timestamp(((Date) source).getTime());
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to an SQL Timestamp.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to an SQL Timestamp.");
     }
     return result;
   }
 
-  public static URI convertToURI(Object source) throws ObjectConversionException {
-    URI result = null;
+  public static URI convertToURI(final Object source) throws ObjectConversionException {
+    URI result;
     if (source instanceof String) {
       if (((String) source).length() == 0) {
         result = null;
@@ -686,29 +684,29 @@ public class ObjectConverter {
       try {
         result = (URI) toObject((byte[]) source);
       } catch (Exception e) {
-        throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a URI.", e);
+        throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a URI.", e);
       }
     } else {
-      throw new ObjectConversionException("Unable to convert a " + source.getClass().getName() + " to a URI.");
+      throw new ObjectConversionException(UNABLE_TO_CONVERT_A_ + source.getClass().getName() + " to a URI.");
     }
     return result;
   }
 
-  public static String convertToString(Object source) throws IOException {
-    String result = null;
+  public static String convertToString(final Object source) throws IOException {
+    String result;
     if (source instanceof Date) {
       if (source instanceof java.sql.Date
               || source instanceof java.sql.Time
               || source instanceof java.sql.Timestamp) {
         result = source.toString();
       } else {
-        SimpleDateFormat sdf = LOCAL_ISO8601_DATETIME_FORMAT.get();
+        final SimpleDateFormat sdf = LOCAL_ISO8601_DTF.get();
         result = sdf.format((Date) source);
       }
     } else if (source instanceof URI) {
-      FileSystemManager manager = VFS.getManager();
-      FileObject fileObject = manager.resolveFile(((URI) source).toString()); //may need to do toAsciiString
-      InputStream istream = fileObject.getContent().getInputStream();
+      final FileSystemManager manager = VFS.getManager();
+      final FileObject fileObject = manager.resolveFile(((URI) source).toString()); //may need to do toAsciiString
+      final InputStream istream = fileObject.getContent().getInputStream();
       result = IOUtils.toString(istream);
     } else if (source instanceof Number || source instanceof Boolean) {
       result = source.toString();
@@ -720,12 +718,12 @@ public class ObjectConverter {
     return result;
   }
 
-  public static byte[] convertToBinary(Object source) throws ObjectConversionException {
+  public static byte[] convertToBinary(final Object source) throws ObjectConversionException {
     try {
       if (source instanceof URI) {
-        FileSystemManager manager = VFS.getManager();
-        FileObject fileObject = manager.resolveFile(((URI) source).toString()); //may need to do toAsciiString
-        InputStream istream = fileObject.getContent().getInputStream();
+        final FileSystemManager manager = VFS.getManager();
+        final FileObject fileObject = manager.resolveFile(((URI) source).toString()); //may need to do toAsciiString
+        final InputStream istream = fileObject.getContent().getInputStream();
         return IOUtils.toByteArray(istream);
       }
     } catch (IOException e1) {
@@ -742,7 +740,7 @@ public class ObjectConverter {
     }
   }
 
-  public static Object convertToObject(Object source) throws ObjectConversionException {
+  public static Object convertToObject(final Object source) throws ObjectConversionException {
     Object result = null;
     if (source instanceof byte[]) {
       if (((byte[]) source).length == 0) {
@@ -766,19 +764,19 @@ public class ObjectConverter {
     return result;
   }
 
-  public static String base64Encode(byte[] data) {
+  public static String base64Encode(final byte[] data) {
     return data == null ? null : Base64.encodeBase64String(data);
   }
 
-  public static byte[] base64Decode(String s) {
-    return s == null ? null : Base64.decodeBase64(s);
+  public static byte[] base64Decode(final String string) {
+    return string == null ? null : Base64.decodeBase64(string);
   }
 
-  public static byte[] toByteArray(Object object) throws IOException {
+  public static byte[] toByteArray(final Object object) throws IOException {
     byte[] retval = null;
     if (object != null) {
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      ObjectOutputStream out = new ObjectOutputStream(bout);
+      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+      final ObjectOutputStream out = new ObjectOutputStream(bout);
       out.writeObject(object);
 
       retval = bout.toByteArray();
@@ -786,13 +784,13 @@ public class ObjectConverter {
     return retval;
   }
 
-  public static Object toObject(byte[] bytes) throws IOException, ClassNotFoundException {
+  public static Object toObject(final byte[] bytes) throws IOException, ClassNotFoundException {
     Object retval = null;
     if (bytes != null) {
-      ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-      ObjectInputStream in = new ObjectInputStream(bin);
+      final ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+      final ObjectInputStream inputStream = new ObjectInputStream(bin);
 
-      retval = in.readObject();
+      retval = inputStream.readObject();
     }
     return retval;
   }

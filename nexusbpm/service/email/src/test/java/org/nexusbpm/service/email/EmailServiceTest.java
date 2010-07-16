@@ -8,13 +8,12 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.junit.After;
 
-import org.nexusbpm.common.NexusTestCase;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
-public class EmailServiceTest extends NexusTestCase {
+public class EmailServiceTest {
 
 //  private Parameter attachment;
   protected EmailSenderServiceRequest data = new EmailSenderServiceRequest();

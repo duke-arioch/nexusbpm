@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.nexusbpm.service.sql;
 
 import com.Ostermiller.util.CSVPrinter;
@@ -36,54 +32,55 @@ import org.nexusbpm.common.data.ObjectConverter;
  * @author Nathan Rose
  * @author Matthew Sandoz
  */
-public class DatabaseUtils {
+public final class DatabaseUtils {
 
-  public static PreparedStatement prepareStatement(Connection connection, String sqlStatement, Map values) throws IOException, SQLException {
-    EventCartridge cartridge = new EventCartridge();
-    SqlReferenceInsertionEventHandler handler = new SqlReferenceInsertionEventHandler();
+  private DatabaseUtils() {
+  }
+
+  public static PreparedStatement prepareStatement(final Connection connection, final String sqlStatement, final Map values) throws IOException, SQLException {
+    final EventCartridge cartridge = new EventCartridge();
+    final SqlReferenceInsertionEventHandler handler = new SqlReferenceInsertionEventHandler();
 
     cartridge.addReferenceInsertionEventHandler(handler);
-    VelocityContext context = new VelocityContext(values);
+    final VelocityContext context = new VelocityContext(values);
     cartridge.attachToContext(context);
 
-    StringWriter writer = new StringWriter();
-    boolean result = Velocity.evaluate(context, writer, "SQL Statement", sqlStatement);
+    final StringWriter writer = new StringWriter();
+    final boolean result = Velocity.evaluate(context, writer, "SQL Statement", sqlStatement);
     if (result) {
-      PreparedStatement p = connection.prepareStatement(writer.toString());
+      final PreparedStatement statement = connection.prepareStatement(writer.toString());
       System.out.println("sql>>" + writer.toString());
       for (int i = 0; i < handler.getVariables().size(); i++) {
-        p.setObject(i + 1, handler.getVariables().get(i));
-      System.out.println("var>>" + i + ":" + handler.getVariables().get(i));
+        statement.setObject(i + 1, handler.getVariables().get(i));
+        System.out.println("var>>" + i + ":" + handler.getVariables().get(i));
       }
-      return p;
+      return statement;
     } else {
       throw new SQLException("Unable to create template for " + writer.toString());
     }
   }
 
-
-  public static Connection getConnection(SqlServiceRequest data) throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
-    Connection connection = null;
-    Class cl = Class.forName(data.getJdbcDriverClass());
-    Driver driver = (Driver) cl.newInstance();
-    Properties properties = new Properties();
+  public static Connection getConnection(final SqlServiceRequest data) throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
+    final Class clazz = Class.forName(data.getJdbcDriverClass());
+    final Driver driver = (Driver) clazz.newInstance();
+    final Properties properties = new Properties();
     if (data.getUserName() != null && data.getUserName().length() > 0) {
       properties.setProperty("user", data.getUserName());
     }
     if (data.getPassword() != null && data.getPassword().length() > 0) {
       properties.setProperty("password", data.getPassword());
     }
-    connection = driver.connect(data.getJdbcUri().toString(), properties);
+    final Connection connection = driver.connect(data.getJdbcUri().toString(), properties);
     connection.setAutoCommit(false);
     return connection;
   }
 
-  public static String[] parse(String sql) {
-    List<String> results = new ArrayList<String>();
-    StringBuilder b = new StringBuilder();
+  public static String[] parse(final String sql) {
+    final List<String> results = new ArrayList<String>();
+    final StringBuilder builder = new StringBuilder();
     int index = 0;
 
-    String[] states = {"code", "line comment", "literal string", "c-style comment"};
+    final String[] states = {"code", "line comment", "literal string", "c-style comment"};
     final int STATE_CODE = 0;
     final int STATE_LINE_COMMENT = 1;
     final int STATE_STRING = 2;
@@ -107,16 +104,16 @@ public class DatabaseUtils {
             depth = 1;
           } else if (c == '\'') {
             // start of a literal string
-            b.append(c);
+            builder.append(c);
             state = STATE_STRING;
           } else if (c == ';') {
             // end of a statement
-            if (b.toString().trim().length() > 0) {
-              results.add(b.toString().trim());
-              b.delete(0, b.length());
+            if (builder.toString().trim().length() > 0) {
+              results.add(builder.toString().trim());
+              builder.delete(0, builder.length());
             }
           } else {
-            b.append(c);
+            builder.append(c);
           }
           break;
 
@@ -124,7 +121,7 @@ public class DatabaseUtils {
         case STATE_LINE_COMMENT:
           if (c == '\r' || c == '\n') {
             state = STATE_CODE;
-            b.append(c);
+            builder.append(c);
           }
           break;
 
@@ -138,11 +135,11 @@ public class DatabaseUtils {
             char c2 = sql.charAt(index + 1);
             if (c2 >= '0' && c2 <= '9') {
               // octal escape of the form '\xxx'
-              b.append(sql.substring(index, index + 4));
+              builder.append(sql.substring(index, index + 4));
               index += 3;
             } else {
               // some other escape
-              b.append(c).append(c2);
+              builder.append(c).append(c2);
               index += 1;
             }
           } else if (c == '\'') {
@@ -150,15 +147,15 @@ public class DatabaseUtils {
             // as a single apostrophe by SQL) or the end of the literal string
             if (index + 1 < sql.length() && sql.charAt(index + 1) == '\'') {
               // two adjacent apostrophes are left intact
-              b.append(c).append(c);
+              builder.append(c).append(c);
               index += 1;
             } else {
-              b.append(c);
+              builder.append(c);
               state = STATE_CODE;
             }
           } else {
             // some other character in the literal string
-            b.append(c);
+            builder.append(c);
           }
           break;
 
@@ -181,8 +178,8 @@ public class DatabaseUtils {
 
     if (state != STATE_CODE && state != STATE_LINE_COMMENT) {
       throw new RuntimeException("Reached the end of the SQL code while parsing a " + states[state]);
-    } else if (b.toString().trim().length() > 0) {
-      results.add(b.toString().trim());
+    } else if (builder.toString().trim().length() > 0) {
+      results.add(builder.toString().trim());
     }
 
     while (results.contains("")) {

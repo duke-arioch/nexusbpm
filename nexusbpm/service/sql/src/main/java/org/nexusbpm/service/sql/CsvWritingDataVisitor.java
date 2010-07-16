@@ -15,20 +15,20 @@ public class CsvWritingDataVisitor implements DataVisitor{
     return printer;
   }
 
-  public void setPrinter(CSVPrinter printer) {
+  public void setPrinter(final CSVPrinter printer) {
     this.printer = printer;
   }
 
-  public void visitColumns(Object[] columns) {
-    String[] toPrint = new String[columns.length];
+  public void visitColumns(final Object[] columns) {
+    final String[] toPrint = new String[columns.length];
     for (int i = 0; i < columns.length; i++) {
       toPrint[i] = columns[i].toString();
     }
     printer.print(toPrint);
   }
 
-  public void visitData(Object[] data) {
-    String[] toPrint = new String[data.length];
+  public void visitData(final Object[] data) {
+    final String[] toPrint = new String[data.length];
     for (int i = 0; i < data.length; i++) {
       toPrint[i] = data[i].toString();
     }

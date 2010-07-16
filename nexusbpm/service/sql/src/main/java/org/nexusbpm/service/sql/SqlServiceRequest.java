@@ -26,7 +26,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return csvInputUri;
   }
 
-  public void setCsvInputUri(URI csvInputUri) {
+  public void setCsvInputUri(final URI csvInputUri) {
     this.csvInputUri = csvInputUri;
   }
 
@@ -34,7 +34,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return csvOutputUri;
   }
 
-  public void setCsvOutputUri(URI csvOutputUri) {
+  public void setCsvOutputUri(final URI csvOutputUri) {
     this.csvOutputUri = csvOutputUri;
   }
 
@@ -42,7 +42,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return dataMappings;
   }
 
-  public void setDataMappings(String dataMappings) {
+  public void setDataMappings(final String dataMappings) {
     this.dataMappings = dataMappings;
   }
 
@@ -50,7 +50,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return jdbcDriverClass;
   }
 
-  public void setJdbcDriverClass(String jdbcDriverClass) {
+  public void setJdbcDriverClass(final String jdbcDriverClass) {
     this.jdbcDriverClass = jdbcDriverClass;
   }
 
@@ -58,7 +58,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return jdbcUri;
   }
 
-  public void setJdbcUri(URI jdbcUri) {
+  public void setJdbcUri(final URI jdbcUri) {
     this.jdbcUri = jdbcUri;
   }
 
@@ -66,7 +66,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return password;
   }
 
-  public void setPassword(String password) {
+  public void setPassword(final String password) {
     this.password = password;
   }
 
@@ -74,7 +74,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return sqlCode;
   }
 
-  public void setSqlCode(String sqlCode) {
+  public void setSqlCode(final String sqlCode) {
     this.sqlCode = sqlCode;
   }
 
@@ -82,7 +82,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return statementType;
   }
 
-  public void setStatementType(String statementType) {
+  public void setStatementType(final String statementType) {
     this.statementType = statementType;
   }
 
@@ -90,7 +90,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return tableName;
   }
 
-  public void setTableName(String tableName) {
+  public void setTableName(final String tableName) {
     this.tableName = tableName;
   }
 
@@ -98,7 +98,7 @@ public class SqlServiceRequest extends NexusServiceRequest {
     return userName;
   }
 
-  public void setUserName(String userName) {
+  public void setUserName(final String userName) {
     this.userName = userName;
   }
 

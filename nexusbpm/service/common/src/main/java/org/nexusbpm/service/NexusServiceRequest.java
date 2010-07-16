@@ -14,7 +14,7 @@ public class NexusServiceRequest {
     return inputVariables;
   }
 
-  public void setInputVariables(Map<String, Object> inputVariables) {
+  public void setInputVariables(final Map<String, Object> inputVariables) {
     this.inputVariables = inputVariables;
   }
 
@@ -22,7 +22,7 @@ public class NexusServiceRequest {
     return requestId;
   }
 
-  public void setRequestId(String requestId) {
+  public void setRequestId(final String requestId) {
     this.requestId = requestId;
   }
 

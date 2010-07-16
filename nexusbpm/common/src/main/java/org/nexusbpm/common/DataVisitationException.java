@@ -11,19 +11,20 @@ package org.nexusbpm.common;
  */
 public class DataVisitationException extends Exception {
 
-  public DataVisitationException(Throwable cause) {
+  public DataVisitationException(final Throwable cause) {
     super(cause);
   }
 
-  public DataVisitationException(String message, Throwable cause) {
+  public DataVisitationException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
-  public DataVisitationException(String message) {
+  public DataVisitationException(final String message) {
     super(message);
   }
 
   public DataVisitationException() {
+    super();
   }
 
 }

@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.nexusbpm.common.DataVisitationException;
 import org.nexusbpm.common.DataVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -18,14 +16,13 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryExecutingDataVisitor implements DataVisitor {
 
-  private String[] columns;
+  private transient String[] columns;
   private long affectedRecords = 0;
   private DataVisitor resultSetVisitor;
   private String sql;
   private Connection connection;
-  private static final Logger logger = LoggerFactory.getLogger(QueryExecutingDataVisitor.class);
 
-  public void visitColumns(Object[] columns) {
+  public void visitColumns(final Object[] columns) {
     this.columns = new String[columns.length];
     for (int i = 0; i < columns.length; i++) {
       this.columns[i] = columns[i].toString();
@@ -33,23 +30,22 @@ public class QueryExecutingDataVisitor implements DataVisitor {
   }
 
   @Override
-  public void visitData(Object[] data) throws DataVisitationException{
+  public void visitData(final Object[] data) throws DataVisitationException{
     try {
-      Map<String, Object> values = new HashMap<String, Object>();
+      final Map<String, Object> values = new HashMap<String, Object>();
       for (int i = 0; i < data.length; i++) {
         values.put(columns[i], data[i]);
       }
-      PreparedStatement statement = DatabaseUtils.prepareStatement(connection, sql, values);
-      boolean b = statement.execute();
+      final PreparedStatement statement = DatabaseUtils.prepareStatement(connection, sql, values);
+      boolean success = statement.execute();
       do {
-        if (b) {
-          ResultSet rs = statement.getResultSet();
-          DatabaseDataSet ds = new DatabaseDataSet(rs);
-          ds.accept(resultSetVisitor);
+        if (success) {
+          final ResultSet resultSet = statement.getResultSet();
+          new DatabaseDataSet(resultSet).accept(resultSetVisitor);
         } else {
           affectedRecords += statement.getUpdateCount();
         }
-      } while (b = (statement.getMoreResults() || statement.getUpdateCount() != -1));
+      } while (success = (statement.getMoreResults() || statement.getUpdateCount() != -1));
     } catch (IOException ex) {
       throw new DataVisitationException("Failed to visit data", ex);
     } catch (SQLException ex) {
@@ -61,7 +57,7 @@ public class QueryExecutingDataVisitor implements DataVisitor {
     return affectedRecords;
   }
 
-  public void setAffectedRecords(long affectedRecords) {
+  public void setAffectedRecords(final long affectedRecords) {
     this.affectedRecords = affectedRecords;
   }
 
@@ -69,7 +65,7 @@ public class QueryExecutingDataVisitor implements DataVisitor {
     return resultSetVisitor;
   }
 
-  public void setResultSetVisitor(DataVisitor resultSetVisitor) {
+  public void setResultSetVisitor(final DataVisitor resultSetVisitor) {
     this.resultSetVisitor = resultSetVisitor;
   }
 
@@ -77,7 +73,7 @@ public class QueryExecutingDataVisitor implements DataVisitor {
     return connection;
   }
 
-  public void setConnection(Connection connection) {
+  public void setConnection(final Connection connection) {
     this.connection = connection;
   }
 
@@ -85,7 +81,7 @@ public class QueryExecutingDataVisitor implements DataVisitor {
     return sql;
   }
 
-  public void setSql(String sql) {
+  public void setSql(final String sql) {
     this.sql = sql;
   }
 }

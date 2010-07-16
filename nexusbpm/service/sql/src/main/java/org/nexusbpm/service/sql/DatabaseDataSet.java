@@ -7,24 +7,29 @@ import org.nexusbpm.common.DataVisitor;
 
 public class DatabaseDataSet implements DataSet {
 
-  ResultSet rs;
+  private final transient ResultSet resultSet;
 
-  public DatabaseDataSet(ResultSet rs) {
-    this.rs = rs;
+  public DatabaseDataSet(final ResultSet resultSet) {
+    this.resultSet = resultSet;
   }
 
-  public void accept(DataVisitor visitor) throws SQLException, DataVisitationException {
-    Object[] data = new Object[rs.getMetaData().getColumnCount()];
-    for (int i = 0; i < data.length; i++) {
-      data[i] = rs.getMetaData().getColumnName(i + 1);
-    }
-    visitor.visitColumns(data);
-    Object[] outData = new Object[rs.getMetaData().getColumnCount()];
-    while (rs.next()) {
+  public void accept(final DataVisitor visitor) throws DataVisitationException {
+    try {
+      Object[] data = new Object[resultSet.getMetaData().getColumnCount()];
       for (int i = 0; i < data.length; i++) {
-        outData[i] = rs.getObject(i + 1);
+        data[i] = resultSet.getMetaData().getColumnName(i + 1);
       }
-      visitor.visitData(outData);
+      visitor.visitColumns(data);
+      final int columnCount = resultSet.getMetaData().getColumnCount();
+      final Object[] outData = new Object[columnCount];
+      while (resultSet.next()) {
+        for (int i = 0; i < data.length; i++) {
+          outData[i] = resultSet.getObject(i + 1);
+        }
+        visitor.visitData(outData);
+      }
+    } catch (SQLException sqle) {
+      throw new DataVisitationException(sqle);
     }
   }
 }

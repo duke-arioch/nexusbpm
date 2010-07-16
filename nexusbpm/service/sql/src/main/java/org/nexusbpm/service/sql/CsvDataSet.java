@@ -1,28 +1,30 @@
 package org.nexusbpm.service.sql;
 
 import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
 import java.io.IOException;
 import org.nexusbpm.common.DataVisitationException;
 import org.nexusbpm.common.DataVisitor;
 
 public class CsvDataSet implements DataSet {
 
-  CSVParser parser;
+  private transient final CSVParser parser;
 
-  public CsvDataSet(CSVParser parser) {
+  public CsvDataSet(final CSVParser parser) {
     this.parser = parser;
   }
 
   @Override
-  public void accept(DataVisitor visitor) throws IOException, DataVisitationException {
-    String[] data = parser.getLine();
-    if (data != null) {
-      visitor.visitColumns(data);
-      while ((data = parser.getLine()) != null) {
-        visitor.visitData(data);
+  public void accept(final DataVisitor visitor) throws DataVisitationException {
+    try {
+      final String[] columnData = parser.getLine();
+      if (columnData != null) {
+        visitor.visitColumns(columnData);
+        for (String[] lineData = parser.getLine(); lineData != null; lineData = parser.getLine()) {
+          visitor.visitData(lineData);
+        }
       }
+    } catch (IOException ioe) {
+      throw new DataVisitationException(ioe);
     }
-
   }
 }

@@ -5,22 +5,18 @@ public class ObjectConversionException extends Exception {
 
 	public ObjectConversionException() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public ObjectConversionException(String message, Throwable cause) {
+	public ObjectConversionException(final String message, final Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
-	public ObjectConversionException(String message) {
+	public ObjectConversionException(final String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
-	public ObjectConversionException(Throwable cause) {
+	public ObjectConversionException(final Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 	
 }

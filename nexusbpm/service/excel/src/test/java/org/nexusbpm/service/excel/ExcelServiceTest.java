@@ -3,11 +3,10 @@ package org.nexusbpm.service.excel;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.nexusbpm.common.NexusTestCase;
 import org.nexusbpm.service.NexusServiceException;
 import org.junit.Test;
 
-public class ExcelServiceTest extends NexusTestCase {
+public class ExcelServiceTest {
 
   @Test
   public void testSpreadsheet() throws NexusServiceException, URISyntaxException {

@@ -16,7 +16,7 @@ public class NexusServiceResponse {
     return err;
   }
 
-  public void setErr(String err) {
+  public void setErr(final String err) {
     this.err = err;
   }
 
@@ -24,7 +24,7 @@ public class NexusServiceResponse {
     return out;
   }
 
-  public void setOut(String out) {
+  public void setOut(final String out) {
     this.out = out;
   }
 
@@ -32,7 +32,7 @@ public class NexusServiceResponse {
     return outputVariables;
   }
 
-  public void setOutputVariables(Map<String, Object> outputVariables) {
+  public void setOutputVariables(final Map<String, Object> outputVariables) {
     this.outputVariables = outputVariables;
   }
 
@@ -40,7 +40,7 @@ public class NexusServiceResponse {
     return returnCode;
   }
 
-  public void setReturnCode(String returnCode) {
+  public void setReturnCode(final String returnCode) {
     this.returnCode = returnCode;
   }
 

@@ -1,16 +1,16 @@
 package org.nexusbpm.service.r;
 
-import org.nexusbpm.common.NexusTestCase;
 import org.nexusbpm.service.NexusServiceException;
 import java.net.URI;
 import junit.framework.Assert;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
-public class RServiceTest extends NexusTestCase {
+public class RServiceTest {
 
   private static String dbCode =
           "library(\"rJava\");\nlibrary(RJDBC);\n"
@@ -39,6 +39,7 @@ public class RServiceTest extends NexusTestCase {
   }
 
   @Test
+  @Ignore
   public void testRPlottingWithOutputGraph() throws Exception {
     RServiceImpl service = new RServiceImpl();
     RServiceRequest data = getPlotData();
@@ -53,11 +54,12 @@ public class RServiceTest extends NexusTestCase {
   }
 
   @Test
+  @Ignore
   public void testRSyntaxExceptionHandling() throws Exception {
     RServiceImpl service = new RServiceImpl();
     RServiceRequest data = new RServiceRequest();
     data.setCode("xxx");
-    data.setServerAddress(getProperty("test.r.server"));
+    data.setServerAddress("localhost");
     try {
       RServiceResponse response = service.execute(data);
       Assert.fail("Exception should have been thrown");

@@ -9,7 +9,7 @@ public class SqlReferenceInsertionEventHandler implements ReferenceInsertionEven
   private final transient List variables = new ArrayList();
 
   @Override
-  public Object referenceInsert(String text, Object replacement) {
+  public Object referenceInsert(final String text, final Object replacement) {
     variables.add(replacement);
     return "?";
   }
