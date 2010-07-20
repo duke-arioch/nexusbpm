@@ -27,12 +27,11 @@ public class RServiceTest {
           + "dev.off();\n"
           + "myfile = file(imageLocation);\n"
           + "radius <- radius + 1;\n";
-  private String unique = "output-" + System.currentTimeMillis();
 
-  private RServiceRequest getPlotData() throws Exception {
-    RServiceRequest data = new RServiceRequest();
+  private RServiceRequest getPlotData() {
+    final RServiceRequest data = new RServiceRequest();
     data.setServerAddress("localhost");
-    data.getInputVariables().put("radius", new Integer(1000));
+    data.getInputVariables().put("radius", 1000);
     data.getInputVariables().put("imageLocation", "test.png");
     data.setCode(imageCode);
     return data;
@@ -41,29 +40,26 @@ public class RServiceTest {
   @Test
   @Ignore
   public void testRPlottingWithOutputGraph() throws Exception {
-    RServiceImpl service = new RServiceImpl();
-    RServiceRequest data = getPlotData();
-    RServiceResponse response = service.execute(data);
+    final RServiceImpl service = new RServiceImpl();
+    final RServiceRequest data = getPlotData();
+    final RServiceResponse response = service.execute(data);
     assertThat("plot R command must not return error " + response.getErr(), response.getErr(), nullValue());
     assertThat("radius should reflect change from R code", (Double) response.getOutputVariables().get("radius"), equalTo(1001.0D));
-    URI uri = (URI) response.getOutputVariables().get("myfile");
+    final URI uri = (URI) response.getOutputVariables().get("myfile");
 //    ImageIcon icon = new ImageIcon(uri.toURL());
 //    JOptionPane.showConfirmDialog(null, "", "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, icon);
-    FileObject file = VFS.getManager().resolveFile(uri.toString());
+    final FileObject file = VFS.getManager().resolveFile(uri.toString());
     assertThat("File size must be 9585", file.getContent().getSize(), equalTo(9585L));
   }
 
-  @Test
+  @Test(expected=NexusServiceException.class)
   @Ignore
-  public void testRSyntaxExceptionHandling() throws Exception {
-    RServiceImpl service = new RServiceImpl();
-    RServiceRequest data = new RServiceRequest();
+  public void testRSyntaxExceptionHandling() throws NexusServiceException{
+    final RServiceImpl service = new RServiceImpl();
+    final RServiceRequest data = new RServiceRequest();
     data.setCode("xxx");
     data.setServerAddress("localhost");
-    try {
-      RServiceResponse response = service.execute(data);
-      Assert.fail("Exception should have been thrown");
-    } catch (NexusServiceException e) {
-    }
+    service.execute(data);
+    Assert.fail("Exception should have been thrown");
   }
 }

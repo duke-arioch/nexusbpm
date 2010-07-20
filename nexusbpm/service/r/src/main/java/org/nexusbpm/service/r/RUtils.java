@@ -19,46 +19,46 @@ public class RUtils {
   /**
    * quotes a given string such that it can be passed to R in R code
    *
-   * @param s
+   * @param source
    *            the string to quote
    * @return quoted string
    */
-  public static String quoteString(String s) {
-    int i = s.indexOf('\\');
-    while (i >= 0) {
-      s = s.substring(0, i + 1) + s.substring(i, s.length());
-      i = s.indexOf('\\', i + 2);
+  public static String quoteString(String source) {
+    int index = source.indexOf('\\');
+    while (index >= 0) {
+      source = source.substring(0, index + 1) + source.substring(index, source.length());
+      index = source.indexOf('\\', index + 2);
     }
-    i = s.indexOf('\"');
-    while (i >= 0) {
-      s = s.substring(0, i) + "\\" + s.substring(i, s.length());
-      i = s.indexOf('\"', i + 2);
+    index = source.indexOf('\"');
+    while (index >= 0) {
+      source = source.substring(0, index) + "\\" + source.substring(index, source.length());
+      index = source.indexOf('\"', index + 2);
     }
-    i = s.indexOf('\n');
-    while (i >= 0) {
-      if (i >= s.length() - 1) {
-        s = s.substring(0, i) + "\\n";
+    index = source.indexOf('\n');
+    while (index >= 0) {
+      if (index >= source.length() - 1) {
+        source = source.substring(0, index) + "\\n";
         break;
       }
-      s = s.substring(0, i) + "\\n" + s.substring(i + 1, s.length());
-      i = s.indexOf('\n', i + 2);
+      source = source.substring(0, index) + "\\n" + source.substring(index + 1, source.length());
+      index = source.indexOf('\n', index + 2);
     }
-    return "\"" + s + "\"";
+    return "\"" + source + "\"";
   }
 
   // wrap the code to run
-  public static String wrapCode(String code) {
+  public static String wrapCode(final String code) {
     return "{ .output<-capture.output(.result<-try({ "
             + code
             + " },silent=FALSE)); if (any(class(.result)=='try-error')) .result else paste(.output, collapse='\n') }";
   }
 
-  public static Object convertREXP(REXP rexp) throws REXPMismatchException {
+  public static Object convertREXP(final REXP rexp) throws REXPMismatchException {
     Object retval = null;
     if (rexp.isInteger() && rexp.isVector()) {
       retval = rexp.asIntegers();
     } else if (rexp.isInteger() && rexp.length() != 1) {
-      retval = new Integer(rexp.asInteger());
+      retval = Integer.valueOf(rexp.asInteger());
     } else if (rexp.isNumeric() && rexp.length() == 1) {
       retval = new Double(rexp.asDouble());
     } else if (rexp.isNumeric() && rexp.length() != 1) {
@@ -75,8 +75,8 @@ public class RUtils {
     return retval;
   }
 
-  public static REXP convertToREXP(Object source) throws REXPMismatchException {
-    REXP retval = null;
+  public static REXP convertToREXP(final Object source) throws REXPMismatchException {
+    REXP retval;
     if (source == null) {
       retval = new REXPNull();
     } else if (source instanceof Integer) {
@@ -91,29 +91,31 @@ public class RUtils {
       retval = new REXPInteger(ArrayUtils.toPrimitive((Integer[]) source));
     } else if (source instanceof Double[]) {
       retval = new REXPDouble(ArrayUtils.toPrimitive((Double[]) source));
+    } else {
+      retval = null;
     }
     return retval;
   }
 
-  public static RSession bytesToSession(byte[] sessionBytes) {
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(sessionBytes);
+  public static RSession bytesToSession(final byte[] sessionBytes) {
+    final ByteArrayInputStream byteStream = new ByteArrayInputStream(sessionBytes);
     RSession session;
     try {
-      ObjectInputStream stream = new ObjectInputStream(byteStream);
+      final ObjectInputStream stream = new ObjectInputStream(byteStream);
       session = (RSession) stream.readObject();
     } catch (IOException exception) {
-      return null;
+      session = null;
     } catch (ClassNotFoundException exception) {
-      return null;
+      session = null;
     }
     return session;
   }
 
-  public static byte[] sessionToBytes(RSession outSession) {
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+  public static byte[] sessionToBytes(final RSession outSession) {
+    final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
     byte[] retval;
     try {
-      ObjectOutputStream stream = new ObjectOutputStream(byteStream);
+      final ObjectOutputStream stream = new ObjectOutputStream(byteStream);
       stream.writeObject(outSession);
       stream.flush();
       retval = byteStream.toByteArray();

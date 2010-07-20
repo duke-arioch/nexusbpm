@@ -12,7 +12,7 @@ public class RServiceResponse extends NexusServiceResponse{
     return keepSession;
   }
 
-  public void setKeepSession(boolean keepSession) {
+  public void setKeepSession(final boolean keepSession) {
     this.keepSession = keepSession;
   }
 
@@ -20,7 +20,7 @@ public class RServiceResponse extends NexusServiceResponse{
     return session;
   }
 
-  public void setSession(byte[] session) {
+  public void setSession(final byte[] session) {
     this.session = session;
   }
 

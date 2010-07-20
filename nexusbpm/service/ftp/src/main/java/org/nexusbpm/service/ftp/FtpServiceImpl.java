@@ -17,22 +17,21 @@ public class FtpServiceImpl implements NexusService {
   public final static Logger LOGGER = LoggerFactory.getLogger(FtpServiceImpl.class);
 
   @Override
-  public FtpServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
-    FtpServiceResponse retval = new FtpServiceResponse();
-    FtpServiceRequest data = (FtpServiceRequest) inData;
+  public FtpServiceResponse execute(final NexusServiceRequest inData) throws NexusServiceException {
+    final FtpServiceResponse retval = new FtpServiceResponse();
+    final FtpServiceRequest data = (FtpServiceRequest) inData;
     try {
-      FileSystemManager manager = VFS.getManager();
-      FileSystemOptions opts = new FileSystemOptions();
+      final FileSystemManager manager = VFS.getManager();
+      final FileSystemOptions opts = new FileSystemOptions();
       FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
-      FileObject source = manager.resolveFile(data.getInput().toString());
-      FileObject dest = manager.resolveFile(data.getOutput().toString());
+      final FileObject source = manager.resolveFile(data.getInput().toString());
+      final FileObject dest = manager.resolveFile(data.getOutput().toString());
       dest.copyFrom(source, Selectors.SELECT_SELF);
     } catch (Exception e) {
       LOGGER.error("FTP Service error!", e);
       throw new NexusServiceException("Error in FTP service!", e);
-    } finally {
-      return retval;
-    }
+    } 
+    return retval;
   }
 
 }

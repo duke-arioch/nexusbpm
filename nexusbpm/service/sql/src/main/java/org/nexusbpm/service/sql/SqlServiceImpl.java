@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
+import java.util.logging.Level;
 import org.nexusbpm.service.NexusServiceException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,13 +43,19 @@ public class SqlServiceImpl implements NexusService {
      *
      */
 
-    Connection connection = null;
     CSVParser parser = null;
     CSVPrinter printer = null;
+    Connection connection;
+    try {
+      connection = DatabaseUtils.getConnection(workItem);
+    } catch (Exception ex) {
+      retval.setErr(ex.getMessage());
+      LOGGER.error("Error in sql connection", ex);
+      throw new NexusServiceException("Error in SQL service!", ex);
+    }
     try {
       parser = getParser(workItem);
       printer = getPrinter(workItem);
-      connection = DatabaseUtils.getConnection(workItem);
       final CsvWritingDataVisitor outvisitor = new CsvWritingDataVisitor();
       outvisitor.setPrinter(printer);
       final DataSet dataSet = (parser == null) ? new MapDataSet(new HashMap()) : new CsvDataSet(parser);

@@ -16,7 +16,7 @@ public class FtpServiceRequest extends NexusServiceRequest {
     return input;
   }
 
-  public void setInput(URI input) {
+  public void setInput(final URI input) {
     this.input = input;
   }
 
@@ -24,7 +24,7 @@ public class FtpServiceRequest extends NexusServiceRequest {
     return output;
   }
 
-  public void setOutput(URI output) {
+  public void setOutput(final URI output) {
     this.output = output;
   }
   

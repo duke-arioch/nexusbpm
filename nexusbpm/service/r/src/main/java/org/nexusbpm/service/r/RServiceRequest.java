@@ -1,7 +1,6 @@
 package org.nexusbpm.service.r;
 
 import org.nexusbpm.service.NexusServiceRequest;
-import java.util.Map;
 
 public class RServiceRequest extends NexusServiceRequest{
 
@@ -15,7 +14,7 @@ public class RServiceRequest extends NexusServiceRequest{
     return code;
   }
 
-  public void setCode(String code) {
+  public void setCode(final String code) {
     this.code = code;
   }
 
@@ -23,7 +22,7 @@ public class RServiceRequest extends NexusServiceRequest{
     return serverAddress;
   }
 
-  public void setServerAddress(String serverAddress) {
+  public void setServerAddress(final String serverAddress) {
     this.serverAddress = serverAddress;
   }
 
@@ -31,7 +30,7 @@ public class RServiceRequest extends NexusServiceRequest{
     return session;
   }
 
-  public void setSession(byte[] sessionIn) {
+  public void setSession(final byte[] sessionIn) {
     this.session = sessionIn;
   }
 
@@ -39,7 +38,7 @@ public class RServiceRequest extends NexusServiceRequest{
     return keepSession;
   }
 
-  public void setKeepSession(boolean keepSession) {
+  public void setKeepSession(final boolean keepSession) {
     this.keepSession = keepSession;
   }
 

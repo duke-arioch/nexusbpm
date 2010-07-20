@@ -26,6 +26,8 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.event.EventCartridge;
 import org.nexusbpm.common.data.ObjectConversionException;
 import org.nexusbpm.common.data.ObjectConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +35,13 @@ import org.nexusbpm.common.data.ObjectConverter;
  * @author Matthew Sandoz
  */
 public final class DatabaseUtils {
+
+  private static final String[] states = {"code", "line comment", "literal string", "c-style comment"};
+  private static final int STATE_CODE = 0;
+  private static final int STATE_LINE_COMMENT = 1;
+  private static final int STATE_STRING = 2;
+  private static final int STATE_C_COMMENT = 3;
+  public static final Logger LOGGER = LoggerFactory.getLogger(SqlServiceImpl.class);
 
   private DatabaseUtils() {
   }
@@ -49,10 +58,10 @@ public final class DatabaseUtils {
     final boolean result = Velocity.evaluate(context, writer, "SQL Statement", sqlStatement);
     if (result) {
       final PreparedStatement statement = connection.prepareStatement(writer.toString());
-      System.out.println("sql>>" + writer.toString());
+      LOGGER.debug("sql>>" + writer.toString());
       for (int i = 0; i < handler.getVariables().size(); i++) {
         statement.setObject(i + 1, handler.getVariables().get(i));
-        System.out.println("var>>" + i + ":" + handler.getVariables().get(i));
+        LOGGER.debug("var>>" + i + ":" + handler.getVariables().get(i));
       }
       return statement;
     } else {
@@ -79,17 +88,11 @@ public final class DatabaseUtils {
     final List<String> results = new ArrayList<String>();
     final StringBuilder builder = new StringBuilder();
     int index = 0;
-
-    final String[] states = {"code", "line comment", "literal string", "c-style comment"};
-    final int STATE_CODE = 0;
-    final int STATE_LINE_COMMENT = 1;
-    final int STATE_STRING = 2;
-    final int STATE_C_COMMENT = 3;
-    int state = STATE_CODE;
     int depth = 0;
+    int state = STATE_CODE;
 
     while (index < sql.length()) {
-      char c = sql.charAt(index);
+      final char c = sql.charAt(index);
       switch (state) {
         // for code: append characters, checking for literal strings, comments, and semicolons
         case STATE_CODE:
@@ -132,7 +135,7 @@ public final class DatabaseUtils {
             if (index + 1 >= sql.length()) {
               throw new RuntimeException("End of SQL code reached while parsing literal string");
             }
-            char c2 = sql.charAt(index + 1);
+            final char c2 = sql.charAt(index + 1);
             if (c2 >= '0' && c2 <= '9') {
               // octal escape of the form '\xxx'
               builder.append(sql.substring(index, index + 4));
@@ -189,12 +192,11 @@ public final class DatabaseUtils {
     return results.toArray(new String[results.size()]);
   }
 
-  public static String unescape(StringBuffer buffer) {
-    if (buffer.length() < 1) {
-    } else if (buffer.charAt(0) == ',') {
+  public static String unescape(final StringBuffer buffer) {
+    if (buffer.length() <= 1 && buffer.charAt(0) == ',') {
       buffer.deleteCharAt(0);
     } else {
-      StringBuffer result = new StringBuffer();
+      final StringBuffer result = new StringBuffer();
 
       while (buffer.length() > 0 && buffer.charAt(0) != ',') {
         if (buffer.charAt(0) == '\\') {
@@ -215,11 +217,11 @@ public final class DatabaseUtils {
     return null;
   }
 
-  private static void saveResultSet(ResultSet results, SqlServiceRequest sData, SqlServiceResponse response) throws SQLException, IOException, ObjectConversionException {
+/*  private static void saveResultSet(final ResultSet results, final SqlServiceRequest sData, final SqlServiceResponse response) throws SQLException, IOException, ObjectConversionException {
     com.Ostermiller.util.CSVPrinter csvPrinter = null;
     OutputStream ostream = null;
-    ResultSetMetaData rsmd = results.getMetaData();
-    FileObject file = VFS.getManager().resolveFile(sData.getRequestId() + ".csv");
+    final ResultSetMetaData rsmd = results.getMetaData();
+    final FileObject file = VFS.getManager().resolveFile(sData.getRequestId() + ".csv");
     String columnNames[] = new String[rsmd.getColumnCount()];
     for (int column = 1; column <= rsmd.getColumnCount(); column++) {
       columnNames[column - 1] = rsmd.getColumnName(column);
@@ -247,7 +249,7 @@ public final class DatabaseUtils {
               value = results.getObject(column);
           }
           if (value instanceof Date || value instanceof URI) {
-            Object o = ObjectConverter.convert(value, String.class);
+            final Object o = ObjectConverter.convert(value, String.class);
             if (o != null) {
               value = o;
             }
@@ -276,5 +278,5 @@ public final class DatabaseUtils {
         }
       }
     }
-  }
+  }*/
 }

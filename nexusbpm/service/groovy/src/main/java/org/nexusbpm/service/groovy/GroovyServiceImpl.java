@@ -14,22 +14,22 @@ import org.nexusbpm.service.NexusServiceRequest;
 public class GroovyServiceImpl implements NexusService {
 
   @Override
-  public GroovyServiceResponse execute(NexusServiceRequest data) throws NexusServiceException {
-    GroovyServiceResponse retval = new GroovyServiceResponse();
-    GroovyServiceRequest jData = (GroovyServiceRequest) data;
-    StringWriter out = new StringWriter();
-    StringWriter err = new StringWriter();
-    PrintWriter outputWriter = new PrintWriter(out);
-    PrintWriter errWriter = new PrintWriter(err);
-    Exception ex = null;
+  public GroovyServiceResponse execute(final NexusServiceRequest data) throws NexusServiceException {
+    final GroovyServiceResponse retval = new GroovyServiceResponse();
+    final GroovyServiceRequest jData = (GroovyServiceRequest) data;
+    final StringWriter out = new StringWriter();
+    final StringWriter err = new StringWriter();
+    final PrintWriter outputWriter = new PrintWriter(out);
+    final PrintWriter errWriter = new PrintWriter(err);
+    Exception exception = null;
 
     try {
       // create the interpreter
-      Binding binding = new Binding();
-      GroovyShell shell = new GroovyShell(binding);
+      final Binding binding = new Binding();
+      final GroovyShell shell = new GroovyShell(binding);
 
       // get a copy of the dynamic variables
-      Map<String, Object> variables = jData.getInputVariables();
+      final Map<String, Object> variables = jData.getInputVariables();
       // Process dynamic attributes (put attribute values into the interpreter).
       for (Map.Entry<String, Object> entry : variables.entrySet()) {
         binding.setVariable(entry.getKey(), entry.getValue());
@@ -48,15 +48,14 @@ public class GroovyServiceImpl implements NexusService {
       }
       e.printStackTrace(new PrintWriter(errWriter));
       e.printStackTrace(System.err);
-      ex = e;
+      exception = e;
     } finally {
       retval.setOut(out.getBuffer().toString());
       retval.setErr(err.getBuffer().toString());
-      if (ex != null) {
-        throw new NexusServiceException("groovy exception", ex);
+      if (exception != null) {
+        throw new NexusServiceException("groovy exception", exception);
       }
-      return retval;
     }
-
+    return retval;
   }
 }

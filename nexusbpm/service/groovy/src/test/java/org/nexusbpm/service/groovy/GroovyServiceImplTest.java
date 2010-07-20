@@ -16,7 +16,7 @@ public class GroovyServiceImplTest{
         
         GroovyShell shell = new GroovyShell(binding);
         Object value = shell.evaluate("println 'Hello World!'; x = 123; err.println('hi');return foo * 10");
-        assert value.equals(new Integer(20));
-        assert binding.getVariable("x").equals(new Integer(123));
+        assert value.equals(Integer.valueOf(20));
+        assert binding.getVariable("x").equals(Integer.valueOf(123));
     }
 }

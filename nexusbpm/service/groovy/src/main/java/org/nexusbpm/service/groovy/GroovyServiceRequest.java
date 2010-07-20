@@ -12,7 +12,7 @@ public class GroovyServiceRequest extends NexusServiceRequest {
     return code;
   }
 
-  public void setCode(String code) {
+  public void setCode(final String code) {
     this.code = code;
   }
 }
