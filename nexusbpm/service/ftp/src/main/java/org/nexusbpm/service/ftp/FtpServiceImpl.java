@@ -18,7 +18,6 @@ public class FtpServiceImpl implements NexusService {
 
   @Override
   public FtpServiceResponse execute(final NexusServiceRequest inData) throws NexusServiceException {
-    final FtpServiceResponse retval = new FtpServiceResponse();
     final FtpServiceRequest data = (FtpServiceRequest) inData;
     try {
       final FileSystemManager manager = VFS.getManager();
@@ -31,7 +30,7 @@ public class FtpServiceImpl implements NexusService {
       LOGGER.error("FTP Service error!", e);
       throw new NexusServiceException("Error in FTP service!", e);
     } 
-    return retval;
+    return new FtpServiceResponse();
   }
 
 }

@@ -13,6 +13,10 @@ public class DatabaseDataSet implements DataSet {
     this.resultSet = resultSet;
   }
 
+  public static DatabaseDataSet getInstance(final ResultSet resultSet) {
+    return new DatabaseDataSet(resultSet);
+  }
+
   public void accept(final DataVisitor visitor) throws DataVisitationException {
     try {
       Object[] data = new Object[resultSet.getMetaData().getColumnCount()];

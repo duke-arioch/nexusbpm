@@ -41,7 +41,7 @@ public class QueryExecutingDataVisitor implements DataVisitor {
       do {
         if (success) {
           final ResultSet resultSet = statement.getResultSet();
-          new DatabaseDataSet(resultSet).accept(resultSetVisitor);
+          DatabaseDataSet.getInstance(resultSet).accept(resultSetVisitor);
         } else {
           affectedRecords += statement.getUpdateCount();
         }

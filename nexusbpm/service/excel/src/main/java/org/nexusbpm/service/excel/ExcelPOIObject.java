@@ -30,24 +30,24 @@ import org.slf4j.LoggerFactory;
  */
 public class ExcelPOIObject {
 
-  private static final transient Logger logger = LoggerFactory.getLogger(ExcelPOIObject.class);
-  protected FileObject template;
-  protected FileObject output;
-  protected String sheetName;
-  protected HSSFWorkbook book;
-  protected HSSFSheet sheet;
-  protected HSSFRow currentRow;
-  protected boolean usingTemplate;
-  protected ExcelStyleFactory styleFactory;
-  protected Map<String, Object> cache;
-  protected final int MAX_CACHE_SIZE = 128;
+  private static final transient Logger LOGGER = LoggerFactory.getLogger(ExcelPOIObject.class);
+  protected transient FileObject template;
+  protected transient FileObject output;
+  protected transient String sheetName;
+  protected transient HSSFWorkbook book;
+  protected transient HSSFSheet sheet;
+  protected transient HSSFRow currentRow;
+  protected transient boolean usingTemplate;
+  protected transient ExcelStyleFactory styleFactory;
+  protected transient Map<String, Object> cache;
+  protected static final int MAX_CACHE_SIZE = 128;
 
-  public ExcelPOIObject(FileObject template, String sheetName) {
+  public ExcelPOIObject(final FileObject template, final String sheetName) {
     this.template = template;
     this.sheetName = sheetName;
   }
 
-  public void setOutputStreamProvider(FileObject output) {
+  public void setOutputStreamProvider(final FileObject output) {
     this.output = output;
   }
 
@@ -57,15 +57,15 @@ public class ExcelPOIObject {
     usingTemplate = false;
 
     if (template != null /* && template.fileExists() */) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Attempting to read POI template file " + template.getName().getURI());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Attempting to read POI template file " + template.getName().getURI());
       }
-      InputStream templateStream = template.getContent().getInputStream();
+      final InputStream templateStream = template.getContent().getInputStream();
       if (templateStream == null) {
         throw new IOException("Couldn't load template file " + template.getName().getURI());
       }
 
-      POIFSFileSystem templateFile = new POIFSFileSystem(templateStream);
+      final POIFSFileSystem templateFile = new POIFSFileSystem(templateStream);
       if (templateFile == null) {
         throw new IOException("Couldn't create POI file from template " + template.getName().getURI());
       }
@@ -73,31 +73,29 @@ public class ExcelPOIObject {
       try {
         book = new HSSFWorkbook(templateFile);
       } catch (NullPointerException e) {
-        IOException ex = new IOException(
-                "Couldn't read from POI template file " + template.getName().getURI());
-        ex.initCause(e);
-        throw ex;
+        throw new IOException(
+                "Couldn't read from POI template file " + template.getName().getURI(), e);
       }
     }
 
     usingTemplate = book != null;
 
     if (book == null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Creating blank POI template (no template file was found)");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creating blank POI template (no template file was found)");
       }
       book = new HSSFWorkbook();
     }
 
-    int sheetIndex = book.getSheetIndex(sheetName);
+    final int sheetIndex = book.getSheetIndex(sheetName);
     if (sheetIndex >= 0 && sheetIndex < book.getNumberOfSheets()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Found sheet named '" + sheetName + "' at index " + sheetIndex);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Found sheet named '" + sheetName + "' at index " + sheetIndex);
       }
       sheet = book.getSheetAt(sheetIndex);
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Creating new sheet named '" + sheetName + "'");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creating new sheet named '" + sheetName + "'");
       }
       sheet = book.createSheet(sheetName);
     }
@@ -107,37 +105,37 @@ public class ExcelPOIObject {
    * Reads data in CSV format and inserts it into the spreadsheet at the specified anchor.
    */
   public int insertTableAtAnchor(
-          FileObject inputData, String anchorString,
-          boolean skipHeader, int rowLimit, int colLimit) throws Exception {
-    CSVParser parser = new CSVParser(inputData.getContent().getInputStream());
-    if (logger.isDebugEnabled()) {
-      logger.debug("POI anchor=" + anchorString + ";rowLimit=" + rowLimit + ";colLimit=" + colLimit);
+          final FileObject inputData, final String anchorString,
+          final boolean skipHeader, final int rowLimit, final int colLimit) throws Exception {
+    final CSVParser parser = new CSVParser(inputData.getContent().getInputStream());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("POI anchor=" + anchorString + ";rowLimit=" + rowLimit + ";colLimit=" + colLimit);
     }
 
-    Anchor anchor = new Anchor(anchorString);
-    int rowOffset = anchor.getRowIndex() - 1;
-    short columnOffset = (short) (anchor.getColIndex() - 1);
+    final Anchor anchor = new Anchor(anchorString);
+    final int rowOffset = anchor.getRowIndex() - 1;
+    final int columnOffset = anchor.getColIndex() - 1;
 
     if (skipHeader) {
       parser.getLine();
     }
     int row = 0;
     for (; (row < rowLimit) || (rowLimit == -1); row++) {
-      String[] line = parser.getLine();
+      final String[] line = parser.getLine();
       if (line == null) {
         break;
       }
 
-      List<String> rowValues = Arrays.asList(line);
+      final List<String> rowValues = Arrays.asList(line);
       currentRow = sheet.getRow(rowOffset + row);
       if (currentRow == null) {
         currentRow = sheet.createRow(rowOffset + row);
       }
 
-      insertRow(row == 0 && !skipHeader, rowValues, columnOffset, colLimit);
+      insertRow(row == 0 && !skipHeader, rowValues, (short) columnOffset, colLimit);
 
-      if (logger.isDebugEnabled() && (row % 1000) == 0 && row > 0) {
-        logger.debug("Inserted " + row + " rows of " + rowLimit + ";lastRow=" + sheet.getLastRowNum());
+      if (LOGGER.isDebugEnabled() && (row % 1000) == 0 && row > 0) {
+        LOGGER.debug("Inserted " + row + " rows of " + rowLimit + ";lastRow=" + sheet.getLastRowNum());
       }
     }
     return row;
@@ -149,8 +147,8 @@ public class ExcelPOIObject {
    * @param columnLimit
    * @throws Exception
    */
-  protected void insertRow(boolean header,
-          List<String> rowValues, short columnOffset, int columnLimit) throws Exception {
+  protected void insertRow(final boolean header,
+          final List<String> rowValues, final short columnOffset, final int columnLimit) throws Exception {
     int size = rowValues.size();
 
     if (columnLimit > 0 && columnLimit < size) {
@@ -163,18 +161,18 @@ public class ExcelPOIObject {
               + (columnOffset + size) + " exceeds the limit of 256");
     }
 
-    Iterator<String> iter = rowValues.iterator();
-    short columnIndex = columnOffset;
+    final Iterator<String> iter = rowValues.iterator();
+    int columnIndex = columnOffset;
     int columnNumber = 0;
 
     while (iter.hasNext()) {
-      String value = iter.next();
+      final String value = iter.next();
 
       HSSFCell cell = currentRow.getCell((short) (columnIndex));
 
       if (cell == null) {
-        if (logger.isTraceEnabled()) {
-          logger.trace("Creating cell for column " + columnNumber
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Creating cell for column " + columnNumber
                   + " in row " + currentRow.getRowNum());
         }
         cell = currentRow.createCell((short) (columnIndex));
@@ -183,8 +181,8 @@ public class ExcelPOIObject {
 //                }
       }
 
-      if (logger.isTraceEnabled()) {
-        logger.trace("Value for column " + columnNumber + " row "
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Value for column " + columnNumber + " row "
                 + currentRow.getRowNum() + " is " + value);
       }
 
@@ -204,7 +202,7 @@ public class ExcelPOIObject {
   /**
    * Sets the cell value based on the type of value given.
    */
-  protected void setCellValue(HSSFCell cell, String sourceValue) {
+  protected void setCellValue(final HSSFCell cell, final String sourceValue) {
     Object value;
 
     if (cache == null) {
@@ -220,17 +218,17 @@ public class ExcelPOIObject {
     }
 
     if (value instanceof Date) {
-      boolean setStyle = !usingTemplate || !HSSFDateUtil.isCellDateFormatted(cell);
+      final boolean setStyle = !usingTemplate || !HSSFDateUtil.isCellDateFormatted(cell);
       cell.setCellValue((Date) value);
       if (setStyle) {
         cell.setCellStyle(getStyleFactory().getCellStyle(value.getClass(), cell.getCellStyle()));
       }
     } else if (value instanceof Number) {
-      String format = getStyleFactory().getCellFormat(cell);
-      boolean setStyle = false;
+//      String format = getStyleFactory().getCellFormat(cell);
+      final boolean setStyle = false;
       cell.setCellValue(((Number) value).doubleValue());
       if (setStyle) {
-        Class c = value.getClass();
+        final Class c = value.getClass();
         if (BigInteger.class.equals(c) || Long.class.equals(c) || Integer.class.equals(c)
                 || Short.class.equals(c) || Byte.class.equals(c)) {
           cell.setCellStyle(getStyleFactory().getCellStyle(Integer.class, cell.getCellStyle()));
@@ -241,7 +239,7 @@ public class ExcelPOIObject {
     } else if (value instanceof Boolean) {
       cell.setCellValue(((Boolean) value).booleanValue());
     } else {
-      cell.setCellValue((value.toString()));
+      cell.setCellValue(value.toString());
     }
   }
 
@@ -255,7 +253,7 @@ public class ExcelPOIObject {
   /**
    * Clears the value for the given cell, but attempts to preserve formatting.
    */
-  protected void clearCellValue(HSSFCell cell) {
+  protected void clearCellValue(final HSSFCell cell) {
     // if we're not using a template, then no value has been set yet
     if (usingTemplate) {
       cell.setCellValue((String) null);
@@ -267,7 +265,7 @@ public class ExcelPOIObject {
    * @param len
    * @return boolean
    */
-  protected boolean checkOutOfBound(int start, int len) {
+  protected boolean checkOutOfBound(final int start, final int len) {
     boolean ret = false;
     if (start + len - 1 > 256) {
       ret = true;
@@ -279,7 +277,7 @@ public class ExcelPOIObject {
    * @throws Exception
    */
   public void save() throws Exception {
-    OutputStream stream = output.getContent().getOutputStream();
+    final OutputStream stream = output.getContent().getOutputStream();
     book.write(stream);
     stream.flush();
     stream.close();

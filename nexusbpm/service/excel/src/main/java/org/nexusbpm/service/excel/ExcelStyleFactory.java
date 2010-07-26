@@ -9,41 +9,41 @@ public class ExcelStyleFactory {
 //    protected Map<Class, HSSFCellStyle> styles;
 //    protected Map<Short, Set<HSSFCellStyle>> styles;
     
-    protected HSSFWorkbook book;
+    protected transient HSSFWorkbook book;
     
-    public ExcelStyleFactory(HSSFWorkbook book) {
+    public ExcelStyleFactory(final HSSFWorkbook book) {
         this.book = book;
     }
     
-    public HSSFCellStyle getCellStyle(Class c, HSSFCellStyle template) {
+    public HSSFCellStyle getCellStyle(final Class c, final HSSFCellStyle template) {
         return getCellStyle(getFormatIndex(c), template);
     }
     
-    public HSSFCellStyle getCellStyle(String format, HSSFCellStyle template) {
+    public HSSFCellStyle getCellStyle(final String format, final HSSFCellStyle template) {
         return getCellStyle(getFormatIndex(format), template);
     }
     
-    public HSSFCellStyle getCellStyle(short format, HSSFCellStyle template) {
+    public HSSFCellStyle getCellStyle(final short format, final HSSFCellStyle template) {
         if(template.getDataFormat() == format) {
             return template;
         }
         
         for(short index = 0; index < book.getNumCellStyles(); index++) {
-            HSSFCellStyle style = book.getCellStyleAt(index);
+            final HSSFCellStyle style = book.getCellStyleAt(index);
             if(matches(style, template, format)) {
                 return style;
             }
         }
         
-        HSSFCellStyle style = clone(template);
+        final HSSFCellStyle style = clone(template);
         
         style.setDataFormat(format);
         
         return style;
     }
     
-    protected HSSFCellStyle clone(HSSFCellStyle style) {
-        HSSFCellStyle retval = book.createCellStyle();
+    protected HSSFCellStyle clone(final HSSFCellStyle style) {
+        final HSSFCellStyle retval = book.createCellStyle();
         
         retval.setAlignment(style.getAlignment());
         retval.setBorderBottom(style.getBorderBottom());
@@ -71,7 +71,7 @@ public class ExcelStyleFactory {
         return retval;
     }
     
-    protected boolean matches(HSSFCellStyle candidate, HSSFCellStyle template, short format) {
+    protected boolean matches(final HSSFCellStyle candidate, final HSSFCellStyle template, final short format) {
         return candidate.getAlignment() == template.getAlignment() &&
             candidate.getBorderBottom() == template.getBorderBottom() &&
             candidate.getBorderLeft() == template.getBorderLeft() &&
@@ -122,16 +122,16 @@ public class ExcelStyleFactory {
 //        return styles.get(c);
 //    }
     
-    public short getFormatIndex(Class c) {
+    public short getFormatIndex(final Class c) {
         return getFormatIndex(getFormatString(c));
     }
     
-    public short getFormatIndex(String formatString) {
-        HSSFDataFormat format = book.createDataFormat();
+    public short getFormatIndex(final String formatString) {
+        final HSSFDataFormat format = book.createDataFormat();
         return format.getFormat(formatString);
     }
     
-    public String getFormatString(Class c) {
+    public String getFormatString(final Class c) {
         if(Integer.class.equals(c)) {
             return "#,##0";
         } else if(Float.class.equals(c)) {
@@ -146,8 +146,8 @@ public class ExcelStyleFactory {
         return "General";
     }
     
-    public String getCellFormat(HSSFCell cell) {
-        HSSFDataFormat dataFormat = book.createDataFormat();
+    public String getCellFormat(final HSSFCell cell) {
+        final HSSFDataFormat dataFormat = book.createDataFormat();
         return dataFormat.getFormat(cell.getCellStyle().getDataFormat());
     }
 }

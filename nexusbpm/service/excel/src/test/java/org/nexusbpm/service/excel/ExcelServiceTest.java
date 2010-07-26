@@ -10,12 +10,11 @@ public class ExcelServiceTest {
 
   @Test
   public void testSpreadsheet() throws NexusServiceException, URISyntaxException {
-    ExcelServiceImpl service = new ExcelServiceImpl();
-    ExcelServiceRequest data = new ExcelServiceRequest();
-    URI file = new URI("res:test.csv");
-    URI template = new URI("res:test.xls");
-    URI csv = new URI("res:test.csv");
-    URI outfile = new URI("tmp:test.out.xls");
+    final ExcelServiceImpl service = new ExcelServiceImpl();
+    final ExcelServiceRequest data = new ExcelServiceRequest();
+    final URI template = new URI("res:test.xls");
+    final URI csv = new URI("res:test.csv");
+    final URI outfile = new URI("tmp:test.out.xls");
     data.setSheetName("Billing Statement");
     data.setExcelAnchor("A16");
     data.setColumnLimit(15);

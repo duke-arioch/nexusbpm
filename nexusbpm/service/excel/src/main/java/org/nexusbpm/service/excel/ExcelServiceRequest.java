@@ -5,9 +5,8 @@ import org.nexusbpm.service.NexusServiceRequest;
 
 public class ExcelServiceRequest extends NexusServiceRequest {
 
-  public static final String DEFAULT_SHEET_NAME = "Sheet1";
-  public static final String DEFAULT_START_CELL = "A1";
-  private static final long serialVersionUID = 1L;
+  public static final String DEF_SHEET = "Sheet1";
+  public static final String DEF_START_CELL = "A1";
   private boolean skipHeader;
   private int rowLimit;
   private int columnLimit;
@@ -21,7 +20,7 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return columnLimit;
   }
 
-  public void setColumnLimit(int columnLimit) {
+  public void setColumnLimit(final int columnLimit) {
     this.columnLimit = columnLimit;
   }
 
@@ -29,15 +28,15 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return dataFile;
   }
 
-  public void setDataFile(URI dataFile) {
+  public void setDataFile(final URI dataFile) {
     this.dataFile = dataFile;
   }
 
   public String getExcelAnchor() {
-    return excelAnchor == null ? DEFAULT_START_CELL : excelAnchor;
+    return excelAnchor == null ? DEF_START_CELL : excelAnchor;
   }
 
-  public void setExcelAnchor(String excelAnchor) {
+  public void setExcelAnchor(final String excelAnchor) {
     this.excelAnchor = excelAnchor;
   }
 
@@ -45,7 +44,7 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return outputFile;
   }
 
-  public void setOutputFile(URI outputFile) {
+  public void setOutputFile(final URI outputFile) {
     this.outputFile = outputFile;
   }
 
@@ -53,15 +52,15 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return rowLimit;
   }
 
-  public void setRowLimit(int rowLimit) {
+  public void setRowLimit(final int rowLimit) {
     this.rowLimit = rowLimit;
   }
 
   public String getSheetName() {
-    return sheetName == null ? DEFAULT_SHEET_NAME : sheetName;
+    return sheetName == null ? DEF_SHEET : sheetName;
   }
 
-  public void setSheetName(String sheetName) {
+  public void setSheetName(final String sheetName) {
     this.sheetName = sheetName;
   }
 
@@ -69,7 +68,7 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return skipHeader;
   }
 
-  public void setSkipHeader(boolean skipHeader) {
+  public void setSkipHeader(final boolean skipHeader) {
     this.skipHeader = skipHeader;
   }
 
@@ -77,7 +76,7 @@ public class ExcelServiceRequest extends NexusServiceRequest {
     return templateFile;
   }
 
-  public void setTemplateFile(URI templateFile) {
+  public void setTemplateFile(final URI templateFile) {
     this.templateFile = templateFile;
   }
 }

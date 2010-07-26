@@ -1,15 +1,10 @@
 package org.nexusbpm.service.sql;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
-import java.util.logging.Level;
 import org.nexusbpm.service.NexusServiceException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -107,42 +102,4 @@ public class SqlServiceImpl implements NexusService {
     return retval;
   }
 
-  protected void executeIgnoringErrors(final Connection connection, final SqlServiceRequest workItem, final SqlServiceResponse response) throws SQLException {
-    Statement statement = null;
-    final String[] statements = DatabaseUtils.parse(workItem.getSqlCode());
-    final StringWriter stringWriter = new StringWriter();
-    final PrintWriter printWriter = new PrintWriter(stringWriter);
-
-    try {
-      connection.setAutoCommit(true);
-      statement = connection.createStatement();
-
-      int affectedRows = 0;
-
-      // loop through and execute the statements
-      for (int index = 0; index < statements.length; index++) {
-        try {
-          final boolean success = statement.execute(statements[index]);
-
-          if (!success) {
-            final int count = statement.getUpdateCount();
-            if (count > 0) {
-              affectedRows += count;
-            }
-          }
-        } catch (Exception e) {
-          printWriter.println("Error ignored executing SQL statement:");
-          printWriter.println(statements[index]);
-          printWriter.println(e.toString());
-          printWriter.println();
-          LOGGER.debug("Error in SQL statement ignored", e);
-        }
-      }
-      response.setErr(stringWriter.toString());
-      response.setRecordCount(affectedRows);
-    } finally {
-      statement.close();
-      DbUtils.commitAndCloseQuietly(connection);
-    }
-  }
 }
