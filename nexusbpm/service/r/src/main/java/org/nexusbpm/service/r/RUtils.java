@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.ArrayUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
@@ -14,7 +16,16 @@ import org.rosuda.REngine.REXPNull;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.Rserve.RSession;
 
-public class RUtils {
+public final class RUtils {
+
+  private static final RUtils INSTANCE = new RUtils();
+
+  private RUtils() {
+  }
+
+  public static RUtils getInstance() {
+    return INSTANCE;
+  }
 
   /**
    * quotes a given string such that it can be passed to R in R code
@@ -23,7 +34,11 @@ public class RUtils {
    *            the string to quote
    * @return quoted string
    */
-  public static String quoteString(String source) {
+
+
+
+  public String quoteString(final String aSource) {
+    String source = aSource;
     int index = source.indexOf('\\');
     while (index >= 0) {
       source = source.substring(0, index + 1) + source.substring(index, source.length());
@@ -47,14 +62,14 @@ public class RUtils {
   }
 
   // wrap the code to run
-  public static String wrapCode(final String code) {
+  public String wrapCode(final String code) {
     return "{ .output<-capture.output(.result<-try({ "
             + code
             + " },silent=FALSE)); if (any(class(.result)=='try-error')) .result else paste(.output, collapse='\n') }";
   }
 
-  public static Object convertREXP(final REXP rexp) throws REXPMismatchException {
-    Object retval = null;
+  public Object convertREXP(final REXP rexp) throws REXPMismatchException {
+    final Object retval;
     if (rexp.isInteger() && rexp.isVector()) {
       retval = rexp.asIntegers();
     } else if (rexp.isInteger() && rexp.length() != 1) {
@@ -67,7 +82,7 @@ public class RUtils {
       retval = rexp.asString();
     } else if (rexp.isString() && rexp.length() != 1) {
       retval = rexp.asStrings();
-    } else if (rexp.length() != 1) {
+    } else if (rexp.length() > 1) {
       retval = rexp.asStrings();
     } else {
       retval = rexp.asString();
@@ -75,7 +90,7 @@ public class RUtils {
     return retval;
   }
 
-  public static REXP convertToREXP(final Object source) throws REXPMismatchException {
+  public REXP convertToREXP(final Object source) throws REXPMismatchException {
     REXP retval;
     if (source == null) {
       retval = new REXPNull();
@@ -97,29 +112,23 @@ public class RUtils {
     return retval;
   }
 
-  public static RSession bytesToSession(final byte[] sessionBytes) {
+  public RSession bytesToSession(final byte[] sessionBytes) throws IOException, ClassNotFoundException {
     final ByteArrayInputStream byteStream = new ByteArrayInputStream(sessionBytes);
-    RSession session;
-    try {
-      final ObjectInputStream stream = new ObjectInputStream(byteStream);
-      session = (RSession) stream.readObject();
-    } catch (IOException exception) {
-      session = null;
-    } catch (ClassNotFoundException exception) {
-      session = null;
-    }
-    return session;
+    final ObjectInputStream stream = new ObjectInputStream(byteStream);
+    return (RSession) stream.readObject();
   }
 
-  public static byte[] sessionToBytes(final RSession outSession) {
-    final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+  public byte[] sessionToBytes(final RSession outSession) {
+    ObjectOutputStream stream;
     byte[] retval;
     try {
-      final ObjectOutputStream stream = new ObjectOutputStream(byteStream);
+      final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+      stream = new ObjectOutputStream(byteStream);
       stream.writeObject(outSession);
       stream.flush();
       retval = byteStream.toByteArray();
-    } catch (IOException exception) {
+    } catch (IOException ex) {
+      Logger.getLogger(RUtils.class.getName()).log(Level.SEVERE, null, ex);
       retval = null;
     }
     return retval;

@@ -10,7 +10,7 @@ public class GroovyServiceImplTest{
 	@Test
     public void testGroovy() {
         Binding binding = new Binding();
-        binding.setVariable("foo", new Integer(2));
+        binding.setVariable("foo", Integer.valueOf(2));
         binding.setVariable("out", System.out);
         binding.setVariable("err", System.err);
         

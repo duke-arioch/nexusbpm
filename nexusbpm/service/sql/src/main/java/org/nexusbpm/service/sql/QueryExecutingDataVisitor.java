@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.nexusbpm.common.DataVisitationException;
 import org.nexusbpm.common.DataVisitor;
@@ -16,25 +18,25 @@ import org.nexusbpm.common.DataVisitor;
  */
 public class QueryExecutingDataVisitor implements DataVisitor {
 
-  private transient String[] columns;
+  private transient List<String> columns;
   private long affectedRecords = 0;
   private DataVisitor resultSetVisitor;
   private String sql;
   private Connection connection;
 
-  public void visitColumns(final Object[] columns) {
-    this.columns = new String[columns.length];
-    for (int i = 0; i < columns.length; i++) {
-      this.columns[i] = columns[i].toString();
+  public void visitColumns(final List columns) {
+    this.columns = new ArrayList<String>();
+    for (int i = 0; i < columns.size(); i++) {
+      this.columns.add(columns.get(i).toString());
     }
   }
 
   @Override
-  public void visitData(final Object[] data) throws DataVisitationException{
+  public void visitData(final List data) throws DataVisitationException{
     try {
       final Map<String, Object> values = new HashMap<String, Object>();
-      for (int i = 0; i < data.length; i++) {
-        values.put(columns[i], data[i]);
+      for (int i = 0; i < data.size(); i++) {
+        values.put(columns.get(i), data.get(i));
       }
       final PreparedStatement statement = DatabaseUtils.prepareStatement(connection, sql, values);
       boolean success = statement.execute();

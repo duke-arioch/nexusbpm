@@ -27,7 +27,12 @@ public class SqlServiceImpl implements NexusService {
   @Override
   public SqlServiceResponse execute(final NexusServiceRequest genericWorkItem) throws NexusServiceException {
     final SqlServiceResponse retval = new SqlServiceResponse();
-    final SqlServiceRequest workItem = (SqlServiceRequest) genericWorkItem;
+    final SqlServiceRequest workItem;
+    if (genericWorkItem instanceof SqlServiceRequest) {
+      workItem = (SqlServiceRequest) genericWorkItem;
+    } else {
+      throw new IllegalArgumentException("method only takes sql service requests.");
+    }
     /*
      * process:
      *

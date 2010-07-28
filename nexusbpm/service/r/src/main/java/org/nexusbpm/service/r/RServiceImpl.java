@@ -38,7 +38,7 @@ public class RServiceImpl implements NexusService {
       result.append("Session Attachment: \n");
       final byte[] sessionBytes = data.getSession();
       if (sessionBytes != null && sessionBytes.length > 0) {
-        session = RUtils.bytesToSession(sessionBytes);
+        session = RUtils.getInstance().bytesToSession(sessionBytes);
         result.append("  attaching to " + session + "\n");
         connection = session.attach();
       } else {
@@ -56,11 +56,11 @@ public class RServiceImpl implements NexusService {
           IOUtils.copy(file.getContent().getInputStream(), ros);
           connection.assign(attributeName, file.getName().getBaseName());
         } else {
-          connection.assign(attributeName, RUtils.convertToREXP(parameter));
+          connection.assign(attributeName, RUtils.getInstance().convertToREXP(parameter));
         }
         result.append("  " + parameter.getClass().getSimpleName() + " " + attributeName + "=" + parameter + "\n");
       }
-      final REXP rExpression = connection.eval(RUtils.wrapCode(data.getCode().replace('\r', '\n')));
+      final REXP rExpression = connection.eval(RUtils.getInstance().wrapCode(data.getCode().replace('\r', '\n')));
       result.append("Execution results:\n" + rExpression.asString() + "\n");
       if (rExpression.isNull() || rExpression.asString().startsWith("Error")) {
         // only error has an attribute (the class)
@@ -74,18 +74,27 @@ public class RServiceImpl implements NexusService {
         final String[] rVariable = connection.eval("class(" + varname + ")").asStrings();
         if (rVariable.length == 2 && "file".equals(rVariable[0]) && "connection".equals(rVariable[1])) {
           final String rFileName = connection.eval("showConnections(TRUE)[" + varname + "]").asString();
-          result.append("  R File " + varname + "=" + rFileName + "\n");
+          result.append("  R File ").append(varname).append('=').append(rFileName).append('\n');
           final RFileInputStream rInputStream = connection.openFile(rFileName);
           final File file = File.createTempFile("nexus-" + data.getRequestId(), ".dat");
           IOUtils.copy(rInputStream, new FileOutputStream(file));
           retval.getOutputVariables().put(varname, file.getCanonicalFile().toURI());
         } else {
-          final Object varvalue = RUtils.convertREXP(connection.eval(varname));
+          final Object varvalue = RUtils.getInstance().convertREXP(connection.eval(varname));
           retval.getOutputVariables().put(varname, varvalue);
           final String printValue = varvalue == null ? "null" : varvalue.getClass().isArray() ? Arrays.asList(varvalue).toString() : varvalue.toString();
-          result.append("  " + (varvalue == null ? "" : varvalue.getClass().getSimpleName()) + " " + varname + "=" + printValue + "\n");
+          result.append("  ")
+                  .append(varvalue == null ? "" : varvalue.getClass().getSimpleName())
+                  .append(' ')
+                  .append(varname)
+                  .append('=')
+                  .append(printValue)
+                  .append('\n');
         }
       }
+    } catch (ClassNotFoundException cnfe) {
+      retval.setErr(cnfe.getMessage());
+      LOGGER.error("Rserve Exception", cnfe);
     } catch (RserveException rse) {
       retval.setErr(rse.getMessage());
       LOGGER.error("Rserve Exception", rse);
@@ -98,17 +107,20 @@ public class RServiceImpl implements NexusService {
     } finally {
       result.append("Session Detachment:\n");
       if (connection != null) {
-        RSession outSession = null;
+        RSession outSession;
         if (retval.isKeepSession()) {
           try {
             outSession = connection.detach();
           } catch (RserveException e) {
             LOGGER.debug("Error detaching R session", e);
+            outSession = null;
           }
+        } else {
+          outSession = null;
         }
         final boolean close = outSession == null;
         if (!close) {
-          retval.setSession(RUtils.sessionToBytes(outSession));
+          retval.setSession(RUtils.getInstance().sessionToBytes(outSession));
           result.append("  suspended session for later use\n");
         }
         connection.close();

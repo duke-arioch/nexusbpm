@@ -22,7 +22,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return bccAddress;
   }
 
-  public void setBccAddress(String bccAddress) {
+  public void setBccAddress(final String bccAddress) {
     this.bccAddress = bccAddress;
   }
 
@@ -30,7 +30,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return body;
   }
 
-  public void setBody(String body) {
+  public void setBody(final String body) {
     this.body = body;
   }
 
@@ -38,7 +38,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return ccAddress;
   }
 
-  public void setCcAddress(String ccAddress) {
+  public void setCcAddress(final String ccAddress) {
     this.ccAddress = ccAddress;
   }
 
@@ -46,7 +46,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return fromAddress;
   }
 
-  public void setFromAddress(String fromAddress) {
+  public void setFromAddress(final String fromAddress) {
     this.fromAddress = fromAddress;
   }
 
@@ -54,7 +54,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return host;
   }
 
-  public void setHost(String host) {
+  public void setHost(final String host) {
     this.host = host;
   }
 
@@ -62,7 +62,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return html;
   }
 
-  public void setHtml(boolean html) {
+  public void setHtml(final boolean html) {
     this.html = html;
   }
 
@@ -70,7 +70,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return password;
   }
 
-  public void setPassword(String password) {
+  public void setPassword(final String password) {
     this.password = password;
   }
 
@@ -78,7 +78,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return port == 0 ? 25 : port;
   }
 
-  public void setPort(int port) {
+  public void setPort(final int port) {
     this.port = port;
   }
 
@@ -86,7 +86,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return subject;
   }
 
-  public void setSubject(String subject) {
+  public void setSubject(final String subject) {
     this.subject = subject;
   }
 
@@ -94,7 +94,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return toAddress;
   }
 
-  public void setToAddress(String toAddress) {
+  public void setToAddress(final String toAddress) {
     this.toAddress = toAddress;
   }
 
@@ -102,7 +102,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return useSSL;
   }
 
-  public void setUseSSL(boolean useSSL) {
+  public void setUseSSL(final boolean useSSL) {
     this.useSSL = useSSL;
   }
 
@@ -110,7 +110,7 @@ public class EmailSenderServiceRequest extends NexusServiceRequest {
     return username;
   }
 
-  public void setUsername(String username) {
+  public void setUsername(final String username) {
     this.username = username;
   }
 }

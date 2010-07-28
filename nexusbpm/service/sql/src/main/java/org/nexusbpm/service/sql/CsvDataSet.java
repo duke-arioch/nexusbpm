@@ -2,6 +2,8 @@ package org.nexusbpm.service.sql;
 
 import com.Ostermiller.util.CSVParser;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.nexusbpm.common.DataVisitationException;
 import org.nexusbpm.common.DataVisitor;
 
@@ -18,9 +20,11 @@ public class CsvDataSet implements DataSet {
     try {
       final String[] columnData = parser.getLine();
       if (columnData != null) {
-        visitor.visitColumns(columnData);
+        final List columns = Arrays.asList(columnData);
+        visitor.visitColumns(columns);
         for (String[] lineData = parser.getLine(); lineData != null; lineData = parser.getLine()) {
-          visitor.visitData(lineData);
+          final List values = Arrays.asList(lineData);
+          visitor.visitData(values);
         }
       }
     } catch (IOException ioe) {

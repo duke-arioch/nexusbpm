@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +121,7 @@ public final class DatabaseUtils {
           if (chr == '\\') {
             // some form of escape sequence
             if (index + 1 >= sql.length()) {
-              throw new RuntimeException("End of SQL code reached while parsing literal string");
+              throw new IllegalArgumentException("End of SQL code reached while parsing literal string");
             }
             final char chr2 = sql.charAt(index + 1);
             if (chr2 >= '0' && chr2 <= '9') {
@@ -168,7 +169,7 @@ public final class DatabaseUtils {
     }
 
     if (state != ST_CODE && state != ST_LINE_COMMENT) {
-      throw new RuntimeException("Reached the end of the SQL code while parsing a " + STATES[state]);
+      throw new IllegalArgumentException("Reached the end of the SQL code while parsing a " + STATES[state]);
     } else if (builder.toString().trim().length() > 0) {
       results.add(builder.toString().trim());
     }

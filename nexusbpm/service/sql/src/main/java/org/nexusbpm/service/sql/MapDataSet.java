@@ -1,5 +1,6 @@
 package org.nexusbpm.service.sql;
 
+import java.util.ArrayList;
 import java.util.Map;
 import org.nexusbpm.common.DataVisitationException;
 import org.nexusbpm.common.DataVisitor;
@@ -14,7 +15,7 @@ public class MapDataSet implements DataSet{
 
   @Override
   public void accept(final DataVisitor visitor) throws DataVisitationException {
-    visitor.visitColumns(map.keySet().toArray());
-    visitor.visitData(map.values().toArray());
+    visitor.visitColumns(new ArrayList(map.keySet()));
+    visitor.visitData(new ArrayList(map.values()));
   }
 }

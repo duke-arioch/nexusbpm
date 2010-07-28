@@ -37,57 +37,44 @@ public class EmailSenderServiceImpl implements NexusService {
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailSenderServiceImpl.class);
 
   @Override
-  public EmailSenderServiceResponse execute(NexusServiceRequest inData) throws NexusServiceException {
-    EmailSenderServiceResponse retval = new EmailSenderServiceResponse();
-    EmailSenderServiceRequest eData = (EmailSenderServiceRequest) inData;
-    String to = null;
-    String cc = null;
-    String bcc = null;
-    String from = null;
-    String username = null;
-    String password = null;
-    String subject = null;
-    String body = null;
-    String host = null;
-    int port;
-    boolean useSSL = false;
-    boolean html = false;
-    StringBuffer b = new StringBuffer();
-    try {
-      to = eData.getToAddress();
-      cc = eData.getCcAddress();
-      bcc = eData.getBccAddress();
-      from = eData.getFromAddress();
-      username = eData.getUsername();
-      password = eData.getPassword();
-      subject = eData.getSubject();
-      body = eData.getBody();
-      host = eData.getHost();
-      port = eData.getPort();
-      useSSL = eData.isUseSSL();
-      html = eData.isHtml();
-
-      LOGGER.debug("Email Request:" + eData.toString());
-
-      send(to, cc, bcc, from, username, password, subject, body, host, port, useSSL, html, eData);
-    } catch (Exception e) {
-      LOGGER.error("Error sending email!\n" + b.toString(), e);
-      throw new NexusServiceException("Error sending email!", e);
-    } finally {
-      return retval;
+  public EmailSenderServiceResponse execute(final NexusServiceRequest inData) throws NexusServiceException {
+    final EmailSenderServiceRequest eData;
+    if (inData instanceof EmailSenderServiceRequest) {
+      eData = (EmailSenderServiceRequest) inData;
+    } else {
+      throw new IllegalArgumentException("method only takes email sender service requests");
     }
+    try {
+      LOGGER.debug("Email Request:" + eData.toString());
+      send(eData.getToAddress(),
+              eData.getCcAddress(),
+              eData.getBccAddress(),
+              eData.getFromAddress(),
+              eData.getUsername(),
+              eData.getPassword(),
+              eData.getSubject(),
+              eData.getBody(),
+              eData.getHost(),
+              eData.getPort(),
+              eData.isUseSSL(),
+              eData.isHtml(),
+              eData);
+    } catch (Exception e) {
+      LOGGER.error("Error sending email!", e);
+      throw new NexusServiceException("Error sending email!", e);
+    }
+    return new EmailSenderServiceResponse();
   }
 
   //Get a session and send the email
-  public void send(String to, String cc, String bcc, String from,
-          String user, String password,
-          String subject, String body, String host, int port, boolean isSecure,
-          boolean html,
-          EmailSenderServiceRequest data)
+  public void send(final String to, final String cc, final String bcc, final String from,
+          final String user, final String password,
+          final String subject, final String body, final String host, final int port, final boolean isSecure,
+          final boolean html,
+          final EmailSenderServiceRequest data)
           throws AddressException, MessagingException, IOException {
-    Message message = null;
-    Session session = getSession(host, Integer.toString(port), isSecure, user, password, from);
-    message = new MimeMessage(session);
+    final Session session = getSession(host, Integer.toString(port), isSecure, user, password);
+    final Message message = new MimeMessage(session);
     message.setHeader("X-Mailer", MAILER);
     message.setSentDate(new Date());
     message.setFrom(new InternetAddress(from));
@@ -100,58 +87,57 @@ public class EmailSenderServiceImpl implements NexusService {
     }//if
     message.setSubject(subject);
 
-    Multipart mp = new MimeMultipart();
+    final Multipart multipart = new MimeMultipart();
 
-    MimeBodyPart bodyPart = new MimeBodyPart();
+    final MimeBodyPart bodyPart = new MimeBodyPart();
     if (html) {
       bodyPart.setContent(body, "text/html");
     } else {
       bodyPart.setContent(body, "text/plain");
     }
-    mp.addBodyPart(bodyPart);
+    multipart.addBodyPart(bodyPart);
 
-    attachFiles(mp, data);
+    attachFiles(multipart, data);
 
-    message.setContent(mp);
+    message.setContent(multipart);
 
     Transport.send(message);
     LOGGER.debug("sent email to '" + to + "' with subject '" + subject + "'");
   }
 
-  private Session getSession(String host, String port, boolean isSecure, String user, String password, String fromAddress) {
-    Properties properties = new Properties();
+  private Session getSession(final String host, final String port, final boolean isSecure, final String user, final String password) {
+    final Properties properties = new Properties();
     properties.put("mail.smtp.host", host);
     properties.put("mail.smtp.port", port);
 //        properties.put("mail.debug", "true");
     if (isSecure) {
       properties.put("mail.smtp.socketFactory.class", SSL_FACTORY);
     }
-    Authenticator authenticator = null;
     Session session;
     if (user != null && user.length() > 0) {
       properties.put("mail.user", user);
       properties.put("mail.password", password);
       properties.put("mail.smtp.auth", "true");
-      if (password != null) {
-        authenticator = new PasswordAuthenticator(user, password);
+      if (password == null) {
+        session = Session.getInstance(properties);
+      } else {
+        final Authenticator authenticator = new PasswordAuthenticator(user, password);
+        session = Session.getInstance(properties, authenticator);
       }
-    }
-    if (authenticator != null) {
-      session = Session.getInstance(properties, authenticator);
     } else {
       session = Session.getInstance(properties);
     }
     return session;
   }
 
-  private void attachFiles(Multipart mp, EmailSenderServiceRequest data) throws IOException, MessagingException {
+  private void attachFiles(final Multipart mp, final EmailSenderServiceRequest data) throws IOException, MessagingException {
     for (Object value : data.getInputVariables().values()) {
       if (value instanceof URI) {
-        FileObject file = VFS.getManager().resolveFile(((URI) value).toString());
+        final FileObject file = VFS.getManager().resolveFile(((URI) value).toString());
 
-        FileObjectDataSource source = new FileObjectDataSource(file, false);
+        final FileObjectDataSource source = new FileObjectDataSource(file, false);
 
-        MimeBodyPart part = new MimeBodyPart();
+        final MimeBodyPart part = new MimeBodyPart();
 
         part.setDataHandler(new DataHandler(source));
         part.setFileName(part.getDataHandler().getName());
@@ -161,11 +147,12 @@ public class EmailSenderServiceImpl implements NexusService {
     }
   }
 
-  private class PasswordAuthenticator extends Authenticator {
+  private static class PasswordAuthenticator extends Authenticator {
 
-    PasswordAuthentication authentication;
+    private transient final PasswordAuthentication authentication;
 
-    PasswordAuthenticator(String username, String password) {
+    PasswordAuthenticator(final String username, final String password) {
+      super();
       authentication = new PasswordAuthentication(username, password);
     }
 
@@ -174,12 +161,12 @@ public class EmailSenderServiceImpl implements NexusService {
     }
   }
 
-  private class FileObjectDataSource implements DataSource {
+  private static class FileObjectDataSource implements DataSource {
 
-    private boolean asciiMode;
-    private FileObject provider;
+    private final transient boolean asciiMode;
+    private final transient FileObject provider;
 
-    FileObjectDataSource(FileObject provider, boolean asciiMode) {
+    FileObjectDataSource(final FileObject provider, final boolean asciiMode) {
       this.provider = provider;
       this.asciiMode = asciiMode;
     }
@@ -197,9 +184,7 @@ public class EmailSenderServiceImpl implements NexusService {
     }
 
     public OutputStream getOutputStream() throws IOException {
-      IOException e = new IOException();
-      e.initCause(new UnsupportedOperationException("OutputStream not supported!"));
-      throw e;
+      throw new IOException(new UnsupportedOperationException("OutputStream not supported!"));
     }
   }
 }

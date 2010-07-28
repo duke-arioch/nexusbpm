@@ -16,12 +16,16 @@ public class GroovyServiceImpl implements NexusService {
   @Override
   public GroovyServiceResponse execute(final NexusServiceRequest data) throws NexusServiceException {
     final GroovyServiceResponse retval = new GroovyServiceResponse();
-    final GroovyServiceRequest jData = (GroovyServiceRequest) data;
+    final GroovyServiceRequest jData;
+    if (data instanceof GroovyServiceRequest) {
+      jData = (GroovyServiceRequest) data;
+    } else {
+      throw new IllegalArgumentException("method only accepts groovy requests");
+    }
     final StringWriter out = new StringWriter();
     final StringWriter err = new StringWriter();
     final PrintWriter outputWriter = new PrintWriter(out);
     final PrintWriter errWriter = new PrintWriter(err);
-    Exception exception = null;
 
     try {
       // create the interpreter
@@ -48,13 +52,9 @@ public class GroovyServiceImpl implements NexusService {
       }
       e.printStackTrace(new PrintWriter(errWriter));
       e.printStackTrace(System.err);
-      exception = e;
     } finally {
       retval.setOut(out.getBuffer().toString());
       retval.setErr(err.getBuffer().toString());
-      if (exception != null) {
-        throw new NexusServiceException("groovy exception", exception);
-      }
     }
     return retval;
   }

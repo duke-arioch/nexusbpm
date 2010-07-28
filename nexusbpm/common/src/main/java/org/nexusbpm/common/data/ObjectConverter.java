@@ -272,9 +272,9 @@ public class ObjectConverter {
 
   protected static Date parseDate(final SimpleDateFormat format, final String text, final ParsePosition position)
           throws ObjectConversionException {
-    final int index = position.getIndex();
     final Date date = format.parse(text, position);
     if (date == null || position.getIndex() < text.length()) {
+      final int index = position.getIndex();
       position.setIndex(index);
       throw new ObjectConversionException("Could not parse '" + text + "'");
     }
