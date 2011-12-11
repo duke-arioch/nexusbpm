@@ -36,8 +36,8 @@
     </dependencies>
   </dependencyManagement>
   <scm>
-    <connection>git://nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</connection>
-    <developerConnection>ssh://msandoz@nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</developerConnection>
+    <connection>scm:git:git://nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</connection>
+    <developerConnection>scm:git:ssh://msandoz@nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</developerConnection>
     <url>http://nexusbpm.git.sourceforge.net/git/gitweb-index.cgi</url>
 </scm>
  <build>
