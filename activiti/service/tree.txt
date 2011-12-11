@@ -1,0 +1,82 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building nexusbpm service bridges for activiti 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.1:tree (default-cli) @ nexusbpm-activiti-service ---
+[INFO] org.nexusbpm:nexusbpm-activiti-service:jar:0.0.1-SNAPSHOT
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- org.springframework:spring-test:jar:3.0.6.RELEASE:test
+[INFO] +- org.nexusbpm:nexusbpm-shared-dependencies:pom:0.0.1-SNAPSHOT:compile
+[INFO] |  +- org.slf4j:slf4j-api:jar:1.6.4:compile
+[INFO] |  +- ch.qos.logback:logback-core:jar:1.0.0:compile
+[INFO] |  +- ch.qos.logback:logback-classic:jar:1.0.0:compile
+[INFO] |  +- org.slf4j:jcl-over-slf4j:jar:1.6.4:compile
+[INFO] |  +- org.slf4j:log4j-over-slf4j:jar:1.6.4:compile
+[INFO] |  +- org.slf4j:jul-to-slf4j:jar:1.6.4:compile
+[INFO] |  +- org.springframework:spring-core:jar:3.0.6.RELEASE:compile
+[INFO] |  |  \- org.springframework:spring-asm:jar:3.0.6.RELEASE:compile
+[INFO] |  \- org.springframework:spring-beans:jar:3.0.6.RELEASE:compile
+[INFO] +- nexusbpm:nexusbpm.common:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- org.codehaus.groovy:groovy-all:jar:1.7.0:compile
+[INFO] |  |  \- jline:jline:jar:0.9.94:compile
+[INFO] |  +- commons-codec:commons-codec:jar:1.4:compile
+[INFO] |  +- commons-io:commons-io:jar:1.4:compile
+[INFO] |  +- org.slf4j:slf4j-simple:jar:1.5.10:compile
+[INFO] |  \- commons-collections:commons-collections:jar:3.2:compile
+[INFO] +- org.nexusbpm.service:nexusbpm-service-common:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  \- commons-lang:commons-lang:jar:2.4:compile
+[INFO] +- nexusbpm.service:nexusbpm.service.email:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- org.springframework:spring-jms:jar:2.5.6:compile
+[INFO] |  |  +- commons-pool:commons-pool:jar:1.3:compile
+[INFO] |  |  +- org.springframework:spring-context:jar:2.5.6:compile
+[INFO] |  |  |  \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] |  |  +- org.springframework:spring-context-support:jar:2.5.6:compile
+[INFO] |  |  \- org.springframework:spring-tx:jar:2.5.6:compile
+[INFO] |  +- javax.mail:mail:jar:1.4.3:compile
+[INFO] |  +- javax.mail:mailapi:jar:1.4.3:compile
+[INFO] |  \- nexusbpm.service:nexusbpm.service.common:jar:0.0.1-SNAPSHOT:compile
+[INFO] +- org.nexusbpm.service:nexusbpm-service-excel:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- org.ostermiller:utils:jar:1.07.00:compile
+[INFO] |  \- poi:poi-2.5.1-final:jar:20040804:compile
+[INFO] +- nexusbpm.service:nexusbpm.service.ftp:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- commons-httpclient:commons-httpclient:jar:3.1:compile
+[INFO] |  \- commons-net:commons-net:jar:2.0:compile
+[INFO] +- nexusbpm.service:nexusbpm.service.groovy:jar:0.0.1-SNAPSHOT:compile
+[INFO] +- nexusbpm.service:nexusbpm.service.r:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- RoSuDA:REngine:jar:0.6-0:compile
+[INFO] |  \- RoSuDA:Rserve:jar:0.6-0:compile
+[INFO] +- nexusbpm.service:nexusbpm.service.sql:jar:0.0.1-SNAPSHOT:compile
+[INFO] |  +- org.springframework:spring-aspects:jar:2.5.6:compile
+[INFO] |  |  +- org.aspectj:aspectjrt:jar:1.6.1:compile
+[INFO] |  |  \- org.aspectj:aspectjweaver:jar:1.6.1:compile
+[INFO] |  +- commons-dbutils:commons-dbutils:jar:1.3:compile
+[INFO] |  \- velocity:velocity:jar:1.5:compile
+[INFO] |     \- oro:oro:jar:2.0.8:compile
+[INFO] +- dumbster:dumbster:jar:1.6:test
+[INFO] +- org.springframework:spring:jar:2.5.6:test (scope not updated to compile)
+[INFO] +- org.drools:drools-core:jar:5.3.0.Final:compile
+[INFO] |  +- org.mvel:mvel2:jar:2.1.0.drools4:compile
+[INFO] |  \- org.drools:knowledge-api:jar:5.3.0.Final:compile
+[INFO] +- com.thoughtworks.xstream:xstream:jar:1.2.2:compile
+[INFO] |  \- xpp3:xpp3_min:jar:1.1.3.4.O:compile
+[INFO] +- commons-vfs:commons-vfs:jar:1.0:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.0.4:compile
+[INFO] +- commons-beanutils:commons-beanutils:jar:1.8.3:compile
+[INFO] +- javax.activation:activation:jar:1.1.1:compile
+[INFO] +- org.activiti:activiti-engine:jar:5.8:compile
+[INFO] |  +- org.apache.commons:commons-email:jar:1.2:compile
+[INFO] |  +- org.livetribe:livetribe-jsr223:jar:2.0.6:compile
+[INFO] |  \- org.mybatis:mybatis:jar:3.0.4:compile
+[INFO] +- org.subethamail:subethasmtp-wiser:jar:1.2:test
+[INFO] |  \- org.subethamail:subethasmtp-smtp:jar:1.2:test
+[INFO] \- com.h2database:h2:jar:1.3.162:test
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.231s
+[INFO] Finished at: Sun Dec 11 10:45:39 EST 2011
+[INFO] Final Memory: 8M/245M
+[INFO] ------------------------------------------------------------------------
