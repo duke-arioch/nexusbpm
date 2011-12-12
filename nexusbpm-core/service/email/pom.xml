@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-service</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nexusbpm.service</groupId>
   <artifactId>nexusbpm-service-email</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>nexusbpm :: core :: service :: email</name>
   <dependencies>
     <dependency>

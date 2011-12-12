@@ -2,14 +2,14 @@
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-core</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nexusbpm</groupId>
   <artifactId>nexusbpm-service</artifactId>
   <name>nexusbpm :: core :: service</name>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <modules>
     <module>common</module>
     <module>email</module>
@@ -24,12 +24,12 @@
       <dependency>
         <groupId>org.nexusbpm</groupId>
         <artifactId>nexusbpm-common</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.nexusbpm.service</groupId>
         <artifactId>nexusbpm-service-common</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>

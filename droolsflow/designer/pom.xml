@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.nexusbpm.droolsflow</groupId>
     <artifactId>nexusbpm-droolsflow</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nexusbpm.droolsflow</groupId>
   <artifactId>nexusbpm-droolsflow-designer</artifactId>
   <name>nexusbpm :: drools flow :: eclipse designer artifacts</name>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

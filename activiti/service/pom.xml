@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.nexusbpm.activiti</groupId>
     <artifactId>nexusbpm-activiti</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>org.nexusbpm.activiti</groupId>
@@ -26,48 +26,48 @@
     <dependency>
       <groupId>org.nexusbpm</groupId>
       <artifactId>nexusbpm-shared-dependencies</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
       <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm</groupId>
       <artifactId>nexusbpm-common</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-common</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-email</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-excel</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-ftp</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-groovy</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-r</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.nexusbpm.service</groupId>
       <artifactId>nexusbpm-service-sql</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>dumbster</groupId>

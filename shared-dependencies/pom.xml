@@ -3,12 +3,12 @@
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <groupId>org.nexusbpm</groupId>
   <artifactId>nexusbpm-shared-dependencies</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>nexusbpm shared dependencies</name>
 <!-- 
 dependencies here should include:
