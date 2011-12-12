@@ -7,10 +7,10 @@
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-parent</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <modules>
     <module>common</module>
     <module>service</module>
@@ -39,12 +39,12 @@
       <dependency>
         <groupId>org.nexusbpm</groupId>
         <artifactId>nexusbpm-common</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.nexusbpm.service</groupId>
         <artifactId>nexusbpm-service-common</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>

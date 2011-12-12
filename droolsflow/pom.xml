@@ -3,13 +3,13 @@
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nexusbpm.droolsflow</groupId>
   <artifactId>nexusbpm-droolsflow</artifactId>
   <name>nexusbpm :: drools flow</name>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
     <module>service</module>
