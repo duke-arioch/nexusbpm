@@ -15,6 +15,13 @@
     <module>droolsflow</module>
     <module>ruleflow</module>
   </modules>
+  <distributionManagement>
+    <repository>
+      <id>myRepoId</id>
+      <name>myCompanyReporsitory</name>
+      <url>file://{project.build.directory}</url>
+    </repository>
+  </distributionManagement>
   <dependencyManagement>
     <dependencies>
   <!-- Test arent transitive!-->
