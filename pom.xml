@@ -50,7 +50,6 @@
           <preparationGoals>clean verify install</preparationGoals>
           <arguments>-DskipTests</arguments>
         </configuration>
-        <
       </plugin>
     </plugins>
   </build>
