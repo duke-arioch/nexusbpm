@@ -2,12 +2,12 @@
     <parent>
         <groupId>org.nexusbpm</groupId>
         <artifactId>nexusbpm-service</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nexusbpm.service</groupId>
     <artifactId>nexusbpm-service-r</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>nexusbpm :: core :: service :: r statistics</name>
     <dependencies>
         <dependency>
