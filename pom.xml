@@ -5,7 +5,7 @@
   <groupId>org.nexusbpm</groupId>
   <artifactId>nexusbpm-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>nexusbpm parent</name>
 
   <modules>
@@ -36,10 +36,9 @@
 <!--    <connection>scm:git:git://nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</connection>
     <developerConnection>scm:git:ssh://msandoz@nexusbpm.git.sourceforge.net/gitroot/nexusbpm/nexusbpm</developerConnection>
     <url>http://nexusbpm.git.sourceforge.net/git/gitweb-index.cgi</url>-->
-    
-    <connection>scm:git:git@github.com:msandoz/nexusbpm.git</connection>
-    <url>scm:git:git@github.com:msandoz/nexusbpm.git</url>
+    <connection>scm:git:github.com:msandoz/nexusbpm.git</connection>
     <developerConnection>scm:git:git@github.com:msandoz/nexusbpm.git</developerConnection>    
+    <url>https://github.com/msandoz/nexusbpm</url>
   </scm>
   <build>
     <plugins>
