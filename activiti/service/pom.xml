@@ -104,6 +104,12 @@
       <artifactId>activiti-engine</artifactId>
       <version>5.8</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.activiti</groupId>
+      <artifactId>activiti-spring</artifactId>
+      <version>5.8</version>
+    </dependency>
         
     <dependency>
       <groupId>org.subethamail</groupId>
@@ -130,5 +136,10 @@
       </resource>
     </resources>    
   </build>
-        
+  <repositories>
+    <repository>
+      <id>alfresco</id>
+      <url>http://maven.alfresco.com/nexus/content/repositories/activiti/</url>
+    </repository>
+  </repositories>
 </project>

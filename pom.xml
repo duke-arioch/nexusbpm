@@ -15,6 +15,10 @@
     <module>droolsflow</module>
     <module>ruleflow</module>
   </modules>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
   <distributionManagement>
     <repository>
       <id>myRepoId</id>

@@ -17,6 +17,8 @@ public class ExcelNexusJavaDelegate extends ExcelServiceImpl implements
 
 	public static final Map<String, String> INPUT_MAP, OUTPUT_MAP;
 	
+  private Boolean skipHeader;
+  
 	static {
 		Map<String, String> inMap = new HashMap<String, String>();
 		inMap.put("skipHeader", "skipHeader");
@@ -48,4 +50,14 @@ public class ExcelNexusJavaDelegate extends ExcelServiceImpl implements
 			execution.setVariable(entry.getValue(), output);
 		}
 	}
+
+  public void setSkipHeader(Boolean skipHeader) {
+    this.skipHeader = skipHeader;
+  }
+
+  public Boolean getSkipHeader() {
+    return skipHeader;
+  }
+
+
 }

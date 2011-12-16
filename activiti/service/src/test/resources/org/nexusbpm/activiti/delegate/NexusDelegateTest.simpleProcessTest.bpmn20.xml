@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="simpleProcess">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="javaService" />
+    
+    <serviceTask id="javaService" 
+                 name="Java service invocation" 
+                 activiti:class="org.nexusbpm.activiti.delegate.ExcelNexusJavaDelegate" >
+      
+      <extensionElements>
+        <activiti:field name="skipHeader"><activiti:string>true</activiti:string></activiti:field>
+        <activiti:field name="rowLimit"><activiti:string>25</activiti:string></activiti:field>
+        <activiti:field name="columnLimit"><activiti:string>25</activiti:string></activiti:field>
+        <activiti:field name="excelAnchor"><activiti:string>A1</activiti:string></activiti:field>
+        <activiti:field name="sheetName"><activiti:string>Sheet 1</activiti:string></activiti:field>
+        <activiti:field name="dataFile"><activiti:string>file://something.csv</activiti:string></activiti:field>
+      </extensionElements>
+                   
+    </serviceTask>                   
+    
+    <sequenceFlow id="flow2" sourceRef="javaService" targetRef="waitState" />
+    
+    <receiveTask id="waitState" />
+    
+    <sequenceFlow id="flow3" sourceRef="waitState" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
