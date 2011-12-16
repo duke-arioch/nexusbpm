@@ -23,7 +23,7 @@
     </repository>
   </distributionManagement>
   <dependencyManagement>
-    <dependencies>
+    <dependencies>  
   <!-- Test arent transitive!-->
       <dependency>
         <groupId>junit</groupId>

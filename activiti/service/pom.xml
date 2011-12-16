@@ -25,12 +25,6 @@
     </dependency>
     <dependency>
       <groupId>org.nexusbpm</groupId>
-      <artifactId>nexusbpm-shared-dependencies</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>org.nexusbpm</groupId>
       <artifactId>nexusbpm-common</artifactId>
       <version>1.0.2-SNAPSHOT</version>
     </dependency>
@@ -73,12 +67,6 @@
       <groupId>dumbster</groupId>
       <artifactId>dumbster</artifactId>
       <version>1.6</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring</artifactId>
-      <version>2.5.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>

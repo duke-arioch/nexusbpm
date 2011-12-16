@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nexusbpm</groupId>
   <artifactId>nexusbpm-core</artifactId>
-  <name>nexusbpm core</name>
+  <name>nexusbpm :: core</name>
   <parent>
     <groupId>org.nexusbpm</groupId>
     <artifactId>nexusbpm-parent</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
   <version>1.0.2-SNAPSHOT</version>
@@ -21,20 +21,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>2.5.6</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring</artifactId>
-        <version>2.5.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-aspects</artifactId>
-        <version>2.5.6</version>
+        <groupId>org.nexusbpm</groupId>
+        <artifactId>nexusbpm-shared-dependencies</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.nexusbpm</groupId>
@@ -85,6 +76,28 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jms</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aspects</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+  </dependencies>
   <build>
     <pluginManagement>
       <plugins>

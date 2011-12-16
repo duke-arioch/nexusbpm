@@ -1,4 +1,4 @@
-package org.nexus.activiti.delegate;
+package org.nexusbpm.activiti.delegate;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.nexus.activiti.delegate;
+package org.nexusbpm.activiti.delegate;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
