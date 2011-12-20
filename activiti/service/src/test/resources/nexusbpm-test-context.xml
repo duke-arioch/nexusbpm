@@ -41,4 +41,12 @@
     <property name="processEngine" ref="processEngine" />
   </bean>   
 
+  <bean id="testme" class="java.lang.String">
+  <constructor-arg value="Hello There!"/>
+  </bean>
+
+  <bean id="excelService" class="org.nexusbpm.service.excel.ExcelServiceImpl">
+  
+  </bean>
+
 </beans>
